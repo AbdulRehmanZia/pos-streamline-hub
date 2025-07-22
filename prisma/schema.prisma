@@ -1,0 +1,33 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  fullname     String
+  password     String
+  profileImg   String?
+  role         Role     @default(MANAGER)
+  refreshToken String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt @default(now())
+}
+
+// model Todo {
+//   id        Int      @id @default(autoincrement())
+//   user      User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+//   user_id   Int
+//   content   String
+//   createdAt DateTime @default(now())
+// }
