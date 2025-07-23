@@ -31,3 +31,5 @@ model User {
 //   content   String
 //   createdAt DateTime @default(now())
 // }
+
+//team  admin users
