@@ -12,10 +12,15 @@ export const registerValidation = Joi.object({
   password: Joi.string()
     .required()
     .min(6)
-    .max(10)
+    .max(20)
+    .messages({
+        "string.empty": "Password is required",
+    "string.min": "Name must be at least 6 characters long"
+    })
     .regex(
       /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[\]{};':"\\|,.<>\/?])[A-Za-z\d!@#$%^&*()_\-+=\[\]{};':"\\|,.<>\/?]{6,20}/
     ),
+  role: Joi.string().valid("ADMIN", "MANAGER", "CASHIER").required(),
 });
 
 export const loginValidation = Joi.object({
@@ -25,6 +30,23 @@ export const loginValidation = Joi.object({
   }),
   password: Joi.string().min(6).required().messages({
     "string.empty": "Password is required",
-    "string.min": "Password must be at least 6 characters",
+    "string.min": "Password must be at least 6 characters long",
   }),
+});
+
+
+export const updateValidation = Joi.object({
+  fullname: Joi.string().min(3).max(30).messages({
+    "string.min": "Name must be at least 3 characters long",
+  }),
+  email: Joi.string().email().messages({
+    "string.email": "Please enter a valid email",
+  }),
+  password: Joi.string()
+    .min(6)
+    .max(20)
+    .regex(
+      /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[\]{};':"\\|,.<>\/?])[A-Za-z\d!@#$%^&*()_\-+=\[\]{};':"\\|,.<>\/?]{6,20}/
+    ),
+  role: Joi.string().valid("ADMIN", "CASHIER"), 
 });

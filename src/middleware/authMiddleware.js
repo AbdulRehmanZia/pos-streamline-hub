@@ -11,7 +11,7 @@ export const verifyJWT = async (req, res, next) => {
     const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
     const user = await prisma.user.findUnique({
       where: { id: decodedToken.id },
-      select: { id: true, fullname: true, email: true },
+      select: { id: true, fullname: true, email: true, role:true },
     });
     if (!user) return ApiError(res, 401, "Invalid Access Token");
     req.user = user

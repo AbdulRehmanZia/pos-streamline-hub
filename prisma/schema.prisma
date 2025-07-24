@@ -9,7 +9,7 @@ datasource db {
 
 enum Role {
   ADMIN
-  MANAGER
+  CASHIER
 }
 
 model User {
@@ -18,18 +18,74 @@ model User {
   fullname     String
   password     String
   profileImg   String?
-  role         Role     @default(MANAGER)
+  role         Role     @default(CASHIER)
   refreshToken String?
   createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt @default(now())
+  updatedAt    DateTime @default(now()) @updatedAt
+
+  store_id Int?
+  store    Store? @relation(fields: [store_id], references: [id])
+  Sale     Sale[]
 }
 
-// model Todo {
-//   id        Int      @id @default(autoincrement())
-//   user      User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
-//   user_id   Int
-//   content   String
-//   createdAt DateTime @default(now())
-// }
+model Store {
+  id      Int    @id @default(autoincrement())
+  name    String
+  members User[]
+}
 
-//team  admin users
+model Category {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+model Product {
+  id            Int        @id @default(autoincrement())
+  name          String
+  price         Float
+  costPrice     Float
+  stockQuantity Int
+  unit          String?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  categoryId    Int
+  categoty      Category   @relation(fields: [categoryId], references: [id])
+  SaleItem      SaleItem[]
+}
+
+
+
+model Customer {
+  id        Int      @id @default(autoincrement())
+  name      String
+  phone     String?
+  email     String?
+  createdAt DateTime @default(now())
+
+  sales Sale[]
+}
+
+model Sale {
+  id          Int       @id @default(autoincrement())
+  user        User      @relation(fields: [userId], references: [id])
+  userId      Int
+  customer    Customer? @relation(fields: [customerId], references: [id])
+  customerId  Int?
+  totalAmount Float
+  paymentType String // Cash, Card, etc.
+  createdAt   DateTime  @default(now())
+
+  saleItems SaleItem[]
+}
+
+model SaleItem {
+  id          Int     @id @default(autoincrement())
+  sale        Sale    @relation(fields: [saleId], references: [id])
+  saleId      Int
+  product     Product @relation(fields: [productId], references: [id])
+  productId   Int
+  quantity    Int
+  priceAtSale Float
+}

@@ -6,11 +6,13 @@ import jwt from "jsonwebtoken";
 import {
   loginValidation,
   registerValidation,
+  updateValidation,
 } from "../utils/validationSchema.js";
 import {
   generateRefreshToken,
   generateAccessToken,
 } from "../services/jwt.service.js";
+import { sendEmail } from "../services/email.service.js";
 
 //Get Users
 
@@ -30,7 +32,7 @@ export const registerUser = async (req, res) => {
     const { error } = registerValidation.validate(req.body);
     if (error) return ApiError(res, 400, error.details[0].message);
 
-    const { fullname, email, password } = req.body;
+    const { fullname, email, password, role } = req.body;
     const findUser = await prisma.user.findUnique({
       where: { email },
     });
@@ -39,12 +41,12 @@ export const registerUser = async (req, res) => {
       return ApiError(res, 400, "User With This Email Already Exists");
 
     const newUser = await prisma.user.create({
-      data: { fullname, email, password },
+      data: { fullname, email, password, role },
     });
 
     const createdUser = await prisma.user.findUnique({
       where: { id: newUser.id },
-      select: { id: true, fullname: true, email: true },
+      select: { id: true, fullname: true, email: true, role: true },
     });
 
     if (!createdUser)
@@ -53,6 +55,26 @@ export const registerUser = async (req, res) => {
         500,
         "Something Went Wrong While Registering The User"
       );
+    console.log("Calling sendEmail...");
+
+    await sendEmail(
+      email,
+      "Welcome to POS 🎉",
+      `Hi ${fullname},
+
+Your account has been created successfully.
+
+🔐 Here are your login credentials:
+
+Email: ${email}
+Password: ${password}
+
+Please keep this information safe.
+
+Thanks,
+POS Team`
+    );
+
     return ApiResponse(res, 201, createdUser, "User Created Successfully");
   } catch (error) {
     console.error("Error in registerUser:", error);
@@ -143,10 +165,10 @@ export const logoutUser = async (req, res) => {
 export const updateUser = async (req, res) => {
   try {
     const userId = req.params.id;
-    const { error } = registerValidation.validate(req.body);
+    const { error } = updateValidation.validate(req.body);
     if (error) return ApiError(res, 400, error.details[0].message);
     const { fullname, email, password } = req.body;
-    await prisma.user.update({
+    const updatedUser = await prisma.user.update({
       where: {
         id: Number(userId),
       },
@@ -155,9 +177,13 @@ export const updateUser = async (req, res) => {
         email,
         password,
       },
+      select: {
+        fullname,
+        email,
+      },
     });
 
-    return ApiResponse(res, 200, null, "User Updated Successfully");
+    return ApiResponse(res, 200, updatedUser, "User Updated Successfully");
   } catch (error) {
     console.error("Error in updateUser:", error);
     return ApiError(res, 500, "Internal Server Error", error);
