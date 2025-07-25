@@ -11,7 +11,7 @@ import {
   generateRefreshToken,
   generateAccessToken,
 } from "../services/jwt.service.js";
-import { sendMail } from "../services/email.service.js";
+import { sendEmail,generateEmailTemplate } from "../services/email.service.js";
 
 //Get Users
 
@@ -72,18 +72,33 @@ export const registerUser = async (req, res) => {
     //   </div>
     // `
     //   );
-    await sendMail({
-      to: email,
-      subject: "🎉 Welcome to POS",
-      message: `
-        <p>Hi <strong>${fullname}</strong>,</p>
-        <p>Your account has been created successfully.</p>
-        <p><strong>Email:</strong> ${email}<br/>
-        <strong>Password:</strong> ${password}</p>
-        <p>Keep your credentials secure!</p>
-        <p>Thanks,<br/>POS Team</p>
-      `,
-    });
+
+    // await sendMail({
+    //   to: email,
+    //   subject: "🎉 Welcome to POS",
+    //   message: `
+    //     <p>Hi <strong>${fullname}</strong>,</p>
+    //     <p>Your account has been created successfully.</p>
+    //     <p><strong>Email:</strong> ${email}<br/>
+    //     <strong>Password:</strong> ${password}</p>
+    //     <p>Keep your credentials secure!</p>
+    //     <p>Thanks,<br/>POS Team</p>
+    //   `,
+    // });
+
+    await sendEmail(
+  email,
+  "🎉 Welcome to SnapFreez!",
+  generateEmailTemplate({
+    message: `
+      <p>Hi <strong>${fullname}</strong>,</p>
+      <p>Welcome to SnapFreez! Your account has been created successfully.</p>
+      <p><strong>Email:</strong> ${email}<br/>
+      <strong>Password:</strong> ${password}</p>
+      <p>We're glad to have you on board! 🚀</p>
+    `,
+  })
+);
 
     return ApiResponse(res, 201, createdUser, "User Created Successfully");
   } catch (error) {

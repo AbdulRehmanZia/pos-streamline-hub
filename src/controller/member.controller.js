@@ -1,9 +1,8 @@
 import prisma from "../db/db.js";
+import { generateEmailTemplate, sendEmail } from "../services/email.service.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
-import {
-  registerValidation,
-} from "../utils/validationSchema.js";
+import { registerValidation } from "../utils/validationSchema.js";
 
 //get All Store Members
 
@@ -61,6 +60,21 @@ export const addStoreMember = async (req, res) => {
         null,
         "Something Went Wrong While Registering The User"
       );
+
+    await sendEmail({
+  to: email,
+  subject: "🎉 Welcome to POS!",
+  message: generateEmailTemplate({
+    message: `
+      <p>Hi <strong>${fullname}</strong>,</p>
+      <p>Welcome to our POS system! Your account has been successfully created.</p>
+      <p><strong>Email:</strong> ${email}<br />
+      <strong>Password:</strong> ${password}</p>
+      <p>Please keep this information safe.</p>
+    `,
+  }),
+});
+
 
     return ApiResponse(
       res,
