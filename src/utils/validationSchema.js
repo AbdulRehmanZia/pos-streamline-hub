@@ -35,18 +35,18 @@ export const loginValidation = Joi.object({
 });
 
 
-export const updateValidation = Joi.object({
-  fullname: Joi.string().min(3).max(30).messages({
-    "string.min": "Name must be at least 3 characters long",
-  }),
-  email: Joi.string().email().messages({
-    "string.email": "Please enter a valid email",
-  }),
-  password: Joi.string()
-    .min(6)
-    .max(20)
-    .regex(
-      /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[\]{};':"\\|,.<>\/?])[A-Za-z\d!@#$%^&*()_\-+=\[\]{};':"\\|,.<>\/?]{6,20}/
-    ),
-  role: Joi.string().valid("ADMIN", "CASHIER"), 
-});
+// export const updateValidation = Joi.object({
+//   fullname: Joi.string().min(3).max(30).messages({
+//     "string.min": "Name must be at least 3 characters long",
+//   }).optional(),
+//   email: Joi.string().email().messages({
+//     "string.email": "Please enter a valid email",
+//   }).optional(),
+//   password: Joi.string()
+//     .min(6)
+//     .max(20)
+//     .regex(
+//       /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[\]{};':"\\|,.<>\/?])[A-Za-z\d!@#$%^&*()_\-+=\[\]{};':"\\|,.<>\/?]{6,20}/
+//     ).optional(),
+//   role: Joi.string().valid("ADMIN", "CASHIER").optional(), 
+// });

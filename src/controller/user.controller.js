@@ -6,20 +6,19 @@ import jwt from "jsonwebtoken";
 import {
   loginValidation,
   registerValidation,
-  updateValidation,
 } from "../utils/validationSchema.js";
 import {
   generateRefreshToken,
   generateAccessToken,
 } from "../services/jwt.service.js";
-import { sendEmail } from "../services/email.service.js";
+import { sendMail } from "../services/email.service.js";
 
 //Get Users
 
 export const getUsers = async (req, res) => {
   try {
     const users = await prisma.user.findMany({});
-    return ApiResponse(200, users, "Users Fetched Successfully");
+    return ApiResponse(res, 200, users, "Users Fetched Successfully");
   } catch (error) {
     console.error("Error in getUsers:", error);
     return ApiError(res, 500, "Internal Server Error", error);
@@ -57,23 +56,34 @@ export const registerUser = async (req, res) => {
       );
     console.log("Calling sendEmail...");
 
-    await sendEmail(
-      email,
-      "Welcome to POS 🎉",
-      `Hi ${fullname},
-
-Your account has been created successfully.
-
-🔐 Here are your login credentials:
-
-Email: ${email}
-Password: ${password}
-
-Please keep this information safe.
-
-Thanks,
-POS Team`
-    );
+    //   await sendEmail(
+    //     email,
+    //     "Welcome to POS 🎉",
+    //     `
+    //   <div style="font-family: sans-serif; line-height: 1.5">
+    //     <h2>Hi ${fullname},</h2>
+    //     <p>Your account has been created successfully.</p>
+    //     <h4>🔐 Login Credentials:</h4>
+    //     <p><strong>Email:</strong> ${email}<br/>
+    //     <strong>Password:</strong> ${password}</p>
+    //     <p>Please keep this information safe.</p>
+    //     <br/>
+    //     <p>Thanks,<br/>POS Team</p>
+    //   </div>
+    // `
+    //   );
+    await sendMail({
+      to: email,
+      subject: "🎉 Welcome to POS",
+      message: `
+        <p>Hi <strong>${fullname}</strong>,</p>
+        <p>Your account has been created successfully.</p>
+        <p><strong>Email:</strong> ${email}<br/>
+        <strong>Password:</strong> ${password}</p>
+        <p>Keep your credentials secure!</p>
+        <p>Thanks,<br/>POS Team</p>
+      `,
+    });
 
     return ApiResponse(res, 201, createdUser, "User Created Successfully");
   } catch (error) {
@@ -160,26 +170,33 @@ export const logoutUser = async (req, res) => {
     return ApiError(res, 500, "Internal Server Error", error);
   }
 };
-//Update User
 
+// Update User
 export const updateUser = async (req, res) => {
   try {
     const userId = req.params.id;
-    const { error } = updateValidation.validate(req.body);
-    if (error) return ApiError(res, 400, error.details[0].message);
-    const { fullname, email, password } = req.body;
+
+    const { fullname, email, password, role } = req.body;
+
+    const updatedData = {};
+    if (fullname !== undefined) updatedData.fullname = fullname;
+    if (email !== undefined) updatedData.email = email;
+    if (password !== undefined) updatedData.password = password;
+    if (role != undefined) updatedData.role = role;
+
+    if (Object.keys(updatedData).length === 0) {
+      return ApiError(res, 400, "No valid fields provided for update");
+    }
+
     const updatedUser = await prisma.user.update({
       where: {
         id: Number(userId),
       },
-      data: {
-        fullname,
-        email,
-        password,
-      },
+      data: updatedData,
       select: {
-        fullname,
-        email,
+        fullname: true,
+        email: true,
+        role: true,
       },
     });
 
