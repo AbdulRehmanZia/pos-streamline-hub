@@ -10,7 +10,7 @@ import {
 } from "../controller/product.controller.js";
 const router = Router();
 
-router.post("/all-products", verifyJWT, authorizeRole("ADMIN"), getAllProducts);
+router.get("/all-products", getAllProducts);
 router.post("/add-product", verifyJWT, authorizeRole("ADMIN"), addProduct);
 router.put(
   "/update-product/:id",
@@ -18,6 +18,6 @@ router.put(
   authorizeRole("ADMIN"),
   updateProduct
 );
-router.delete("/delete-product/:id", verifyJWT, authorizeRole(), deleteProduct);
+router.delete("/delete-product/:id", verifyJWT, authorizeRole("ADMIN"), deleteProduct);
 
 export default router;

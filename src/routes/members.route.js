@@ -23,10 +23,9 @@ router.delete(
   authorizeRole("ADMIN"),
   deleteStoreMember
 );
-router.post(
+router.get(
   "/get-all-members",
-  verifyJWT,
-  authorizeRole("ADMIN"),
+ 
   getAllStoreMembers
 );
 

@@ -11,7 +11,7 @@ import {
   generateRefreshToken,
   generateAccessToken,
 } from "../services/jwt.service.js";
-import { sendEmail,generateEmailTemplate } from "../services/email.service.js";
+import { sendEmail, generateEmailTemplate } from "../services/email.service.js";
 
 //Get Users
 
@@ -31,7 +31,7 @@ export const registerUser = async (req, res) => {
     const { error } = registerValidation.validate(req.body);
     if (error) return ApiError(res, 400, error.details[0].message);
 
-    const { fullname, email, password, role } = req.body;
+    const { fullname, email, password } = req.body;
     const findUser = await prisma.user.findUnique({
       where: { email },
     });
@@ -40,7 +40,7 @@ export const registerUser = async (req, res) => {
       return ApiError(res, 400, "User With This Email Already Exists");
 
     const newUser = await prisma.user.create({
-      data: { fullname, email, password, role },
+      data: { fullname, email, password, role: "ADMIN" },
     });
 
     const createdUser = await prisma.user.findUnique({
@@ -56,49 +56,19 @@ export const registerUser = async (req, res) => {
       );
     console.log("Calling sendEmail...");
 
-    //   await sendEmail(
-    //     email,
-    //     "Welcome to POS 🎉",
-    //     `
-    //   <div style="font-family: sans-serif; line-height: 1.5">
-    //     <h2>Hi ${fullname},</h2>
-    //     <p>Your account has been created successfully.</p>
-    //     <h4>🔐 Login Credentials:</h4>
-    //     <p><strong>Email:</strong> ${email}<br/>
-    //     <strong>Password:</strong> ${password}</p>
-    //     <p>Please keep this information safe.</p>
-    //     <br/>
-    //     <p>Thanks,<br/>POS Team</p>
-    //   </div>
-    // `
-    //   );
-
-    // await sendMail({
-    //   to: email,
-    //   subject: "🎉 Welcome to POS",
-    //   message: `
-    //     <p>Hi <strong>${fullname}</strong>,</p>
-    //     <p>Your account has been created successfully.</p>
-    //     <p><strong>Email:</strong> ${email}<br/>
-    //     <strong>Password:</strong> ${password}</p>
-    //     <p>Keep your credentials secure!</p>
-    //     <p>Thanks,<br/>POS Team</p>
-    //   `,
-    // });
-
-    await sendEmail(
-  email,
-  "🎉 Welcome to SnapFreez!",
-  generateEmailTemplate({
-    message: `
-      <p>Hi <strong>${fullname}</strong>,</p>
-      <p>Welcome to SnapFreez! Your account has been created successfully.</p>
-      <p><strong>Email:</strong> ${email}<br/>
-      <strong>Password:</strong> ${password}</p>
-      <p>We're glad to have you on board! 🚀</p>
-    `,
-  })
-);
+    await sendEmail({
+      to: email,
+      subject: "🎉 Welcome to POS!",
+      message: generateEmailTemplate({
+        message: `
+         <p>Hi <strong>${fullname}</strong>,</p>
+         <p>Welcome to our POS system! Your account has been successfully created.</p>
+         <p><strong>Email:</strong> ${email}<br />
+         <strong>Password:</strong> ${password}</p>
+         <p>Please keep this information safe.</p>
+       `,
+      }),
+    });
 
     return ApiResponse(res, 201, createdUser, "User Created Successfully");
   } catch (error) {
