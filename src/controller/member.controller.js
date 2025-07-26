@@ -2,7 +2,7 @@ import prisma from "../db/db.js";
 import { generateEmailTemplate, sendEmail } from "../services/email.service.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
-import { registerValidation } from "../utils/validationSchema.js";
+import { registerMemberValidation } from "../utils/validationSchema.js";
 
 //get All Store Members
 
@@ -27,7 +27,7 @@ export const addStoreMember = async (req, res) => {
     if (req.user.role !== "ADMIN") {
       return ApiError(res, 403, "Only Admin Can Add Store Members");
     }
-    const { error } = registerValidation.validate(req.body);
+    const { error } = registerMemberValidation.validate(req.body);
     if (error) return ApiError(res, 400, error.details[0].message);
     const { fullname, email, password, role } = req.body;
     const findMember = await prisma.user.findUnique({
