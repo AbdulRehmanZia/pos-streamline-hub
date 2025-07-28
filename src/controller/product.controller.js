@@ -51,7 +51,7 @@ export const addProduct = async (req, res) => {
 export const getAllProducts = async (req, res) => {
   try {
     const allProduct = await prisma.product.findMany({
-      include: { category: true }, // Include category info
+      include: { category: true }, 
     });
 
     return ApiResponse(
@@ -61,7 +61,7 @@ export const getAllProducts = async (req, res) => {
       "All Products retrieved successfully"
     );
   } catch (error) {
-    return ApiError(res, 400, error, "Internal Server Error");
+    return ApiError(res, 500, error, "Internal Server Error");
   }
 };
 
@@ -84,7 +84,7 @@ export const deleteProduct = async (req, res) => {
 
     return ApiResponse(res, 200, null, "Product successfully deleted");
   } catch (error) {
-    console.error("Delete Error:", error);
+    console.error("Product Delete Error:", error);
     return ApiError(res, 500, error.message || "Internal Server Error");
   }
 };

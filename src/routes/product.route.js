@@ -10,7 +10,7 @@ import {
 } from "../controller/product.controller.js";
 const router = Router();
 
-router.get("/all-products", getAllProducts);
+router.get("/all-products",verifyJWT, getAllProducts);
 router.post("/add-product", verifyJWT, authorizeRole("ADMIN"), addProduct);
 router.put(
   "/update-product/:id",

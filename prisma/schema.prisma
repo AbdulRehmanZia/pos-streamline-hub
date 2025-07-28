@@ -9,6 +9,7 @@ datasource db {
 
 enum Role {
   ADMIN
+  //MANAGER
   CASHIER
 }
 
@@ -23,16 +24,16 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @default(now()) @updatedAt
 
-  store_id Int?
-  store    Store? @relation(fields: [store_id], references: [id])
-  Sale     Sale[]
+  // store_id Int?
+  // store    Store? @relation(fields: [store_id], references: [id])
+  Sale Sale[]
 }
 
-model Store {
-  id      Int    @id @default(autoincrement())
-  name    String
-  members User[]
-}
+// model Store {
+//   id      Int    @id @default(autoincrement())
+//   name    String
+//   members User[]
+// }
 
 model Category {
   id        Int       @id @default(autoincrement())
@@ -41,6 +42,7 @@ model Category {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 }
+
 model Product {
   id            Int        @id @default(autoincrement())
   name          String
@@ -55,27 +57,28 @@ model Product {
   SaleItem      SaleItem[]
 }
 
+// model Customer {
+//   id        Int      @id @default(autoincrement())
+//   name      String
+//   phone     String?
+//   email     String?
+//   createdAt DateTime @default(now())
 
-
-model Customer {
-  id        Int      @id @default(autoincrement())
-  name      String
-  phone     String?
-  email     String?
-  createdAt DateTime @default(now())
-
-  sales Sale[]
-}
+//   sales Sale[]
+// }
 
 model Sale {
-  id          Int       @id @default(autoincrement())
-  user        User      @relation(fields: [userId], references: [id])
-  userId      Int
-  customer    Customer? @relation(fields: [customerId], references: [id])
-  customerId  Int?
-  totalAmount Float
-  paymentType String // Cash, Card, etc.
-  createdAt   DateTime  @default(now())
+  id            Int      @id @default(autoincrement())
+  user          User     @relation(fields: [userId], references: [id])
+  userId        Int
+  // customer    Customer? @relation(fields: [customerId], references: [id])
+  // customerId  Int?
+  customerName  String?
+  customerEmail String?
+  customerPhone String?
+  totalAmount   Float
+  paymentType   String // Cash, Card, etc.
+  createdAt     DateTime @default(now())
 
   saleItems SaleItem[]
 }

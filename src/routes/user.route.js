@@ -12,12 +12,15 @@ import { verifyJWT } from "../middleware/authMiddleware.js";
 
 const router = Router();
 
-router.get("/get", getUsers);
-router.post("/login", loginUser);
-router.post("/logout", verifyJWT, logoutUser);
+//Public
 router.post("/register", registerUser);
-router.put("/update/:id", updateUser);
-router.delete("/delete/:id", deleteUser);
-router.post("/refresh-token", refreshAccessToken)
+router.post("/login", loginUser);
+
+//Protected
+router.get("/get", verifyJWT, getUsers);
+router.post("/logout", verifyJWT, logoutUser);
+router.put("/update/:id",verifyJWT, updateUser);
+router.delete("/delete/:id",verifyJWT, deleteUser);
+router.post("/refresh-token",verifyJWT, refreshAccessToken)
 
 export default router;

@@ -23,10 +23,6 @@ router.delete(
   authorizeRole("ADMIN"),
   deleteStoreMember
 );
-router.get(
-  "/get-all-members",
- 
-  getAllStoreMembers
-);
+router.get("/get-all-members", verifyJWT, getAllStoreMembers);
 
 export default router;
