@@ -13,4 +13,6 @@ app.use(urlencoded({limit: "20kb", extended: true}))
 app.use(express.static("public"))
 app.use(cookieParser())
 
+// arcjet
+
 export default app
