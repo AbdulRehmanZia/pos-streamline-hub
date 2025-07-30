@@ -3,6 +3,7 @@ import ApiError from "../../../utils/ApiError.js";
 import ApiResponse from "../../../utils/ApiResponse.js";
 import {sendEmail} from "../../../services/email.service.js"
 import { generateEmailTemplate } from "../../../services/email.service.js";
+import { registerMemberValidation } from "../../../utils/validationSchema.js";
 
 //register Store Member
 export const addStoreMember = async (req, res) => {

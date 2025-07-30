@@ -7,45 +7,30 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  ADMIN
-  //MANAGER
-  CASHIER
-}
-
 model User {
   id           Int      @id @default(autoincrement())
   email        String   @unique
-  fullname     String
-  password     String
-  profileImg   String?
-  role         Role     @default(CASHIER)
-  refreshToken String?
   createdAt    DateTime @default(now())
+  password     String
+  fullname     String
+  profileImg   String?
+  refreshToken String?
+  role         Role     @default(CASHIER)
   updatedAt    DateTime @default(now()) @updatedAt
-
-  // store_id Int?
-  // store    Store? @relation(fields: [store_id], references: [id])
-  Sale Sale[]
+  Sale         Sale[]
 }
-
-// model Store {
-//   id      Int    @id @default(autoincrement())
-//   name    String
-//   members User[]
-// }
 
 model Category {
   id        Int       @id @default(autoincrement())
   name      String    @unique
-  products  Product[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  products  Product[]
 }
 
 model Product {
   id            Int        @id @default(autoincrement())
-  name          String
+  name          String     @unique
   price         Float
   costPrice     Float
   stockQuantity Int
@@ -57,38 +42,30 @@ model Product {
   SaleItem      SaleItem[]
 }
 
-// model Customer {
-//   id        Int      @id @default(autoincrement())
-//   name      String
-//   phone     String?
-//   email     String?
-//   createdAt DateTime @default(now())
-
-//   sales Sale[]
-// }
-
 model Sale {
-  id            Int      @id @default(autoincrement())
-  user          User     @relation(fields: [userId], references: [id])
+  id            Int        @id @default(autoincrement())
   userId        Int
-  // customer    Customer? @relation(fields: [customerId], references: [id])
-  // customerId  Int?
-  customerName  String?
-  customerEmail String?
-  customerPhone String?
   totalAmount   Float
-  paymentType   String // Cash, Card, etc.
-  createdAt     DateTime @default(now())
-
-  saleItems SaleItem[]
+  paymentType   String
+  createdAt     DateTime   @default(now())
+  customerEmail String?
+  customerName  String?
+  customerPhone String?
+  user          User       @relation(fields: [userId], references: [id])
+  saleItems     SaleItem[]
 }
 
 model SaleItem {
   id          Int     @id @default(autoincrement())
-  sale        Sale    @relation(fields: [saleId], references: [id])
   saleId      Int
-  product     Product @relation(fields: [productId], references: [id])
   productId   Int
   quantity    Int
   priceAtSale Float
+  product     Product @relation(fields: [productId], references: [id])
+  sale        Sale    @relation(fields: [saleId], references: [id])
+}
+
+enum Role {
+  ADMIN
+  CASHIER
 }

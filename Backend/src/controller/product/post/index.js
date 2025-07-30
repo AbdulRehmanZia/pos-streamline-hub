@@ -26,7 +26,12 @@ export const addProduct = async (req, res) => {
     if (!category) {
       return ApiError(res, 404, null, "Category not found");
     }
-
+const existingProduct = await prisma.product.findUnique({
+      where: { name },
+    });
+    if (existingProduct)
+      return ApiError(res, 400, "This Product Already Exists");
+    
     const newProduct = await prisma.product.create({
       data: {
         name,
