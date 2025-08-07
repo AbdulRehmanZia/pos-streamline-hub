@@ -1,9 +1,9 @@
 import React from 'react'
 
-export default function Product() {
+export default function ForgetPassword() {
   return (
     <div>
-      Product
+      ForgetPassword
     </div>
   )
 }

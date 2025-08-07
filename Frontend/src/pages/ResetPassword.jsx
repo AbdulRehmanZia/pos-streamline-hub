@@ -1,9 +1,9 @@
 import React from 'react'
 
-export default function Product() {
+export default function ResetPassword() {
   return (
     <div>
-      Product
+      Reset Password
     </div>
   )
 }

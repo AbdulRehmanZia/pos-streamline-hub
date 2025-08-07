@@ -7,9 +7,9 @@ import helmet from "helmet"
 const app = express()
 
 app.use(cors({
-    origin: process.env.CORS_ORIGIN,
-    credentials: true
-}))
+  origin: 'http://localhost:5173', //frontend URL 
+  credentials: true, //for cookies
+}));
 
 app.use(helmet())
 app.use(express.json({limit: "20kb"}))
