@@ -19,7 +19,7 @@ model User {
   refreshToken String?
   role         Role     @default(CASHIER)
   updatedAt    DateTime @default(now()) @updatedAt
-  Sale         Sale[]
+  //Sale         Sale[]
 }
 
 model Category {
@@ -46,14 +46,14 @@ model Product {
 
 model Sale {
   id            Int        @id @default(autoincrement())
-  userId        Int
+  //userId        Int
   totalAmount   Float
   paymentType   String
   createdAt     DateTime   @default(now())
   customerEmail String?
   customerName  String?
   customerPhone String?
-  user          User       @relation(fields: [userId], references: [id])
+  //user          User       @relation(fields: [userId], references: [id])
   saleItems     SaleItem[]
 }
 

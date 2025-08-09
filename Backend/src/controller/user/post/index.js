@@ -36,19 +36,19 @@ export const registerUser = async (req, res) => {
       );
     console.log("Calling sendEmail...");
 
-    await sendEmail({
-      to: email,
-      subject: "🎉 Welcome to POS!",
-      message: generateEmailTemplate({
-        message: `
-         <p>Hi <strong>${fullname}</strong>,</p>
-         <p>Welcome to our POS system! Your account has been successfully created.</p>
-         <p><strong>Email:</strong> ${email}<br />
-         <strong>Password:</strong> ${password}</p>
-         <p>Please keep this information safe.</p>
-       `,
-      }),
-    });
+    // await sendEmail({
+    //   to: email,
+    //   subject: "🎉 Welcome to POS!",
+    //   message: generateEmailTemplate({
+    //     message: `
+    //      <p>Hi <strong>${fullname}</strong>,</p>
+    //      <p>Welcome to our POS system! Your account has been successfully created.</p>
+    //      <p><strong>Email:</strong> ${email}<br />
+    //      <strong>Password:</strong> ${password}</p>
+    //      <p>Please keep this information safe.</p>
+    //    `,
+    //   }),
+    // });
 
     return ApiResponse(res, 201, createdUser, "User Created Successfully");
   } catch (error) {

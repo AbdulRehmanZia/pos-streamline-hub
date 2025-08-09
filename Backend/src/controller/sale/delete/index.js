@@ -14,8 +14,21 @@ export const deleteSale = async (req, res) => {
       return ApiError(res, 404, null, "Sale not found");
     }
 
-    await prisma.sale.delete({
-      where: { id: Number(saleId) },
+    // Use transaction to delete related records first
+    await prisma.$transaction(async (tx) => {
+      // First delete all related SaleItems
+      await tx.saleItem.deleteMany({
+        where: {
+          saleId: Number(saleId)
+        }
+      });
+
+      // Then delete the sale
+      await tx.sale.delete({
+        where: { 
+          id: Number(saleId) 
+        }
+      });
     });
 
     return ApiResponse(res, 200, null, "Sale successfully deleted");

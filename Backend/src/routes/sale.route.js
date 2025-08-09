@@ -6,14 +6,14 @@ import { addSale, deleteSale, getAllSales, saleSearch } from "../controller/sale
 
 const router = Router();
 
-router.get("/", verifyJWT, getAllSales);
-router.get("/search", verifyJWT, saleSearch);
-router.post("/add-sale", verifyJWT, addSale);
+router.get("/", getAllSales);
+router.get("/search",  saleSearch);
+router.post("/add-sale", addSale);
 
 router.delete(
-  "/delete-product/:id",
-  verifyJWT,
-  authorizeRole("ADMIN"),
+  "/delete-sale/:id",
+  
+  //authorizeRole("ADMIN"),
   deleteSale
 );
 
