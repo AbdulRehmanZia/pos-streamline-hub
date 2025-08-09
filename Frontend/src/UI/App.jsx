@@ -9,7 +9,7 @@ import Dashboard from '../pages/Dashboard';
 import Catagery from '../pages/Catagery';
 
 import Login from '../components/Login';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Member from '../pages/Member';
 import Forgetpassword from '../pages/Forgetpassword';
 

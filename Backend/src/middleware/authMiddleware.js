@@ -4,9 +4,10 @@ import prisma from "../db/db.js";
 
 export const verifyJWT = async (req, res, next) => {
   try {
-    const token =
-      req.cookies?.accessToken ||
-      req.header("Authorization")?.replace("Bearer ", "");
+    // const token =
+    //   req.cookies?.accessToken ||
+    //   req.header("Authorization")?.replace("Bearer ", "");
+    const token = req.cookies?.accessToken || req.headers.authorization?.split(" ")[1];
     if (!token) return ApiError(res, 401, "Unauthorized request");
     const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
     const user = await prisma.user.findUnique({

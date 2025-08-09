@@ -12,8 +12,8 @@ export const addSale = async (req, res) => {
       return ApiError(res, 400, "Invalid Sale Data");
     }
 
-    const userId = req.user.id;
-    if (!userId) return ApiError(res, 401, "Unauthorized");
+    // const userId = req.user.id;
+    // if (!userId) return ApiError(res, 401, "Unauthorized");
 
     let totalAmount = 0;
 
@@ -51,7 +51,7 @@ export const addSale = async (req, res) => {
 
       return await tx.sale.create({
         data: {
-          userId,
+          // userId,
           paymentType,
           totalAmount,
           customerName,

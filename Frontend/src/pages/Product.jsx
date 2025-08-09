@@ -25,7 +25,7 @@ import {
 
 
 import React, { useState, useEffect } from 'react';
-import { api } from "../Instant/BaseUrl"
+import { api } from "../Instance/BaseUrl"
 
 export default function Product() {
   // const catageries = ['Electronics', 'Furniture', 'Accessories', 'Fashion', 'Home Decor', 'Pharma', 'Health & Beauty', 'Sports', 'Toys', 'Books'];

@@ -2,7 +2,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { api } from "../Instant/BaseUrl";
+import { api } from "../Instance/BaseUrl";
 
 const Login = ({setIsAdminLoggedIn} ) => {
   const navigate = useNavigate();
