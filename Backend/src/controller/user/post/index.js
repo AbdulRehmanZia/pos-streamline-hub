@@ -20,7 +20,7 @@ export const registerUser = async (req, res) => {
       return ApiError(res, 400, "User With This Email Already Exists");
 
     const newUser = await prisma.user.create({
-      data: { fullname, email, password, role: "ADMIN" },
+      data: { fullname, email, password, role: "admin" },
     });
 
     const createdUser = await prisma.user.findUnique({

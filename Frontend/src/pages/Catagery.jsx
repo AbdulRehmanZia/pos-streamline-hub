@@ -2,7 +2,7 @@
 
 import axios from "axios";
 import { useState, useEffect } from "react";
-import { api } from "../Instance/BaseUrl";
+import { api } from "../Instance/api";
 
 
 

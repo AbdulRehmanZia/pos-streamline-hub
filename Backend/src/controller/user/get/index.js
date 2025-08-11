@@ -6,7 +6,16 @@ import ApiResponse from "../../../utils/ApiResponse.js";
 
 export const getUsers = async (req, res) => {
   try {
-    const users = await prisma.user.findMany({});
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        fullname: true,
+        email: true,
+      },
+       orderBy: {
+        createdAt: 'desc', // Newest first
+      },
+    });
     return ApiResponse(res, 200, users, "Users Fetched Successfully");
   } catch (error) {
     console.error("Error in getUsers:", error);

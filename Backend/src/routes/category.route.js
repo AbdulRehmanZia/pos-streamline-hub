@@ -10,17 +10,17 @@ import {
 const router = Router();
 
 router.get("/", verifyJWT, getAllCategories);
-router.post("/add-category", verifyJWT, authorizeRole("ADMIN"), addCategory);
+router.post("/add-category", verifyJWT, authorizeRole("admin"), addCategory);
 router.put(
   "/update-category/:id",
   verifyJWT,
-  authorizeRole("ADMIN"),
+  authorizeRole("admin"),
   updateCategory
 );
 router.delete(
   "/delete-category/:id",
   verifyJWT,
-  authorizeRole("ADMIN"),
+  authorizeRole("admin"),
   deleteCategory
 );
 

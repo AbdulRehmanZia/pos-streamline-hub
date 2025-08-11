@@ -11,7 +11,7 @@ export const logoutUser = async (req, res) => {
       data: { refreshToken: null },
     });
     const options = {
-      httpOnly: true,
+      // httpOnly: true,
       secure: true,
        maxAge: 7 * 24 * 60 * 60 * 1000 
     };

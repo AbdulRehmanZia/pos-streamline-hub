@@ -4,7 +4,7 @@ import { HashRouter as Router, Routes, Route, BrowserRouter } from 'react-router
 import Sidebar from '../components/Slidebaar';
 
 import Product from '../pages/Product';
-import Sales from '../pages/Sales';
+import Sales from '../pages/Sale';
 import Dashboard from '../pages/Dashboard';
 import Catagery from '../pages/Catagery';
 
