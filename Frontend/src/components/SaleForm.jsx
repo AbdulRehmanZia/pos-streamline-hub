@@ -3,6 +3,7 @@ import { api } from "../Instance/api";
 import { PlusCircle, Trash2, Loader, CreditCard, HandCoins, Search, X } from "lucide-react";
 import toast from "react-hot-toast";
 
+
 function SaleForm({ onSaleAdded }) {
   const [paymentType, setPaymentType] = useState("");
   const [customerName, setCustomerName] = useState("");
@@ -31,7 +32,7 @@ function SaleForm({ onSaleAdded }) {
       setSearchLoading(true);
       const res = await api.get(`admin/products?search=${query}`);
       console.log("Products: ", res);
-      
+
       setSearchResults(res.data.data);
     } catch (error) {
       console.error("Error searching products", error);
@@ -130,7 +131,7 @@ function SaleForm({ onSaleAdded }) {
             className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
-        
+
         <div className="space-y-2">
           <label className="block text-sm font-medium text-gray-700">Customer Email</label>
           <input
@@ -141,7 +142,7 @@ function SaleForm({ onSaleAdded }) {
             className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
-        
+
         <div className="space-y-2">
           <label className="block text-sm font-medium text-gray-700">Customer Phone</label>
           <input
@@ -151,7 +152,7 @@ function SaleForm({ onSaleAdded }) {
             className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
-        
+
         <div className="space-y-2">
           <label className="block text-sm font-medium text-gray-700">Payment Type</label>
           <div className="relative">
@@ -190,13 +191,13 @@ function SaleForm({ onSaleAdded }) {
             Add More Item
           </button>
         </div>
-        
+
         <div className="space-y-4">
           {items.map((item, index) => (
             <div key={index} className="flex gap-3 items-end">
               <div className="flex-1 relative">
                 <label className="block text-sm font-medium text-gray-700">Product</label>
-                
+
                 {item.product ? (
                   <div className="relative">
                     <div className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50">
@@ -228,7 +229,7 @@ function SaleForm({ onSaleAdded }) {
                         className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       />
                     </div>
-                    
+
                     {activeSearchIndex === index && (searchQuery || searchResults.length > 0) && (
                       <div className="absolute z-10 mt-1 w-full bg-white shadow-lg rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto max-h-60 focus:outline-none sm:text-sm">
                         {searchLoading ? (
@@ -255,7 +256,7 @@ function SaleForm({ onSaleAdded }) {
                   </div>
                 )}
               </div>
-              
+
               <div className="w-24">
                 <label className="block text-sm font-medium text-gray-700">Quantity</label>
                 <input
@@ -268,7 +269,7 @@ function SaleForm({ onSaleAdded }) {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
-              
+
               {items.length > 1 && (
                 <button
                   type="button"
@@ -302,3 +303,4 @@ function SaleForm({ onSaleAdded }) {
 }
 
 export default SaleForm;
+
