@@ -11,6 +11,7 @@ export const getUsers = async (req, res) => {
         id: true,
         fullname: true,
         email: true,
+        role: true
       },
        orderBy: {
         createdAt: 'desc', // Newest first

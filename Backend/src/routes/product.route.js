@@ -13,19 +13,19 @@ const router = Router();
 
 router.get(
   "/",
-  // verifyJWT,
+  verifyJWT,
   getAllProducts
 );
 router.post("/add-product", verifyJWT, authorizeRole("admin"), addProduct);
 router.put(
   "/update-product/:id",
-  // verifyJWT,
+   verifyJWT,
   authorizeRole("admin"),
   updateProduct
 );
 router.delete(
   "/delete-product/:id",
-  // verifyJWT,
+   verifyJWT,
   authorizeRole("admin"),
   deleteProduct
 );

@@ -5,11 +5,13 @@ import ApiResponse from "../../../utils/ApiResponse.js";
 //Add Category
 export const addCategory = async (req, res) => {
   try {
-    const { name } = req.body;
+    let { name } = req.body;
     if (!name) return ApiError(res, 400, "Name Is Required");
-
-    const existingCategory = await prisma.category.findUnique({
-      where: { name },
+    name = name.trim().toLowerCase();
+    const existingCategory = await prisma.category.findFirst({
+      where: {
+        name: name,
+      },
     });
     if (existingCategory)
       return ApiError(res, 400, "This Category Already Exists");

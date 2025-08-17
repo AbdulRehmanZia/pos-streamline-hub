@@ -34,6 +34,7 @@ const Login = () => {
 
       setUser(user);
       setAccessToken(accessToken);
+      localStorage.setItem("accessToken", accessToken);
       toast.success("Login successful!");
       navigate("/dashboard");
     } catch (error) {
@@ -46,27 +47,27 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-[#1C3333] p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className="w-full max-w-md bg-white rounded-lg shadow-md overflow-hidden border border-gray-200"
+        className="w-full max-w-md bg-white rounded-lg shadow-md overflow-hidden border border-[#1C3333]/20"
       >
-        <div className="bg-white p-8 text-center border-b border-gray-200">
-          <h1 className="text-2xl font-bold text-gray-800">Welcome Back</h1>
-          <p className="mt-2 text-gray-600">Sign in to continue to your account</p>
+        <div className="bg-white p-8 text-center border-b border-[#1C3333]/20">
+          <h1 className="text-2xl font-bold text-[#1C3333]">Welcome Back</h1>
+          <p className="mt-2 text-[#1C3333]/80">Sign in to continue to your account</p>
         </div>
 
         <div className="p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="email" className="block text-sm font-medium text-[#1C3333]">
                 Email Address
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-400" />
+                  <Mail className="h-5 w-5 text-[#1C3333]/60" />
                 </div>
                 <input
                   type="email"
@@ -76,18 +77,18 @@ const Login = () => {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                  className="block w-full pl-10 pr-3 py-2.5 border border-[#1C3333]/30 rounded-md focus:ring-2 focus:ring-[#1C3333] focus:border-[#1C3333] transition text-[#1C3333] bg-white"
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="password" className="block text-sm font-medium text-[#1C3333]">
                 Password
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-400" />
+                  <Lock className="h-5 w-5 text-[#1C3333]/60" />
                 </div>
                 <input
                   type={showPassword ? "text" : "password"}
@@ -97,7 +98,7 @@ const Login = () => {
                   value={formData.password}
                   onChange={handleChange}
                   required
-                  className="block w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                  className="block w-full pl-10 pr-10 py-2.5 border border-[#1C3333]/30 rounded-md focus:ring-2 focus:ring-[#1C3333] focus:border-[#1C3333] transition text-[#1C3333] bg-white"
                 />
                 <button
                   type="button"
@@ -105,9 +106,9 @@ const Login = () => {
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
                 >
                   {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                    <EyeOff className="h-5 w-5 text-[#1C3333]/60 hover:text-[#1C3333]" />
                   ) : (
-                    <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                    <Eye className="h-5 w-5 text-[#1C3333]/60 hover:text-[#1C3333]" />
                   )}
                 </button>
               </div>
@@ -117,7 +118,7 @@ const Login = () => {
               <button
                 type="button"
                 onClick={() => navigate("/forgetpassword")}
-                className="text-sm text-blue-600 hover:text-blue-800 hover:underline focus:outline-none"
+                className="text-sm text-[#1C3333] hover:text-[#1C3333]/70 hover:underline focus:outline-none"
               >
                 Forgot password?
               </button>
@@ -129,8 +130,8 @@ const Login = () => {
               disabled={isLoading}
               className={`w-full py-3 px-4 rounded-md font-medium text-white transition-colors ${
                 isLoading
-                  ? "bg-blue-400 cursor-not-allowed"
-                  : "bg-blue-600 hover:bg-blue-700 shadow-sm"
+                  ? "bg-[#1C3333]/80 cursor-not-allowed"
+                  : "bg-[#1C3333] hover:bg-[#1C3333]/90 shadow-sm"
               }`}
             >
               {isLoading ? (

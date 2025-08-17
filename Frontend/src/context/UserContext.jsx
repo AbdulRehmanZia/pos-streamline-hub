@@ -26,7 +26,7 @@ const UserContextProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await api.post("/user/logout", {}, { withCredentials: true });
+      await api.post("/user/logout", {});
     } catch (err) {
       console.error("Backend logout failed", err);
     }

@@ -6,13 +6,13 @@ import { addSale, deleteSale, getSales } from "../controller/sale/index.js";
 
 const router = Router();
 
-router.get("/", getSales);
-router.post("/add-sale", addSale);
+router.get("/",verifyJWT, getSales);
+router.post("/add-sale",verifyJWT, addSale);
 
 router.delete(
   "/delete-sale/:id",
-  
-  //authorizeRole("admin"),
+  verifyJWT,
+  authorizeRole("admin"),
   deleteSale
 );
 

@@ -20,33 +20,33 @@ export default function Sale() {
   };
 
   return (
-    <div className="min-h-screen bg-white p-6">
+    <div className="min-h-screen bg-[#F4F9F9] p-6">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-blue-500 text-white">
+            <div className="p-2 rounded-lg bg-[#1C3333] text-white">
               <ShoppingCart className="h-6 w-6" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-800">Sales Management</h1>
-              <p className="text-gray-600">Track and manage your sales transactions</p>
+              <h1 className="text-2xl font-bold text-[#1C3333]">Sales Management</h1>
+              <p className="text-[#1C3333]/80">Track and manage your sales transactions</p>
             </div>
           </div>
 
           <Sheet>
             <SheetTrigger asChild>
-              <button className="inline-flex items-center px-4 py-2.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-400 hover:bg-blue-600  transition-colors">
+              <button className="inline-flex items-center px-4 py-2.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-[#1C3333] hover:bg-[#1C3333]/90 transition-colors">
                 <PlusCircle className="mr-2 h-5 w-5" />
                 New Sale
               </button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-full sm:max-w-md">
+            <SheetContent side="right" className="w-full sm:max-w-md bg-[#F4F9F9]">
               <SheetHeader className="mb-6">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-blue-500 text-white">
+                  <div className="p-2 rounded-lg bg-[#1C3333] text-white">
                     <ShoppingCart className="h-6 w-6" />
                   </div>
-                  <SheetTitle className="text-xl font-bold text-gray-800">
+                  <SheetTitle className="text-xl font-bold text-[#1C3333]">
                     New Sale
                   </SheetTitle>
                 </div>
@@ -56,11 +56,10 @@ export default function Sale() {
           </Sheet>
         </div>
 
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-lg border border-[#1C3333]/20 shadow-sm overflow-hidden">
           <div className="p-6">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold text-gray-800">Recent Transactions</h2>
-              
+              <h2 className="text-lg font-semibold text-[#1C3333]">Recent Transactions</h2>
             </div>
             <SalesTable refresh={refresh} />
           </div>
