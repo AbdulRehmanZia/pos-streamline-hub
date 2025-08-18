@@ -12,17 +12,17 @@ import {
 const router = Router();
 
 router.get("/", verifyJWT, getAllStoreMembers);
-router.post("/add-member", verifyJWT, authorizeRole("ADMIN"), addStoreMember);
+router.post("/add-member", verifyJWT, authorizeRole("admin"), addStoreMember);
 router.put(
   "/update-member/:id",
   verifyJWT,
-  authorizeRole("ADMIN"),
+  authorizeRole("admin"),
   updateStoreMember
 );
 router.delete(
   "/delete-member/:id",
   verifyJWT,
-  authorizeRole("ADMIN"),
+  authorizeRole("admin"),
   deleteStoreMember
 );
 

@@ -43,7 +43,7 @@ export const registerMemberValidation = Joi.object({
     .regex(
       /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[\]{};':"\\|,.<>\/?])[A-Za-z\d!@#$%^&*()_\-+=\[\]{};':"\\|,.<>\/?]{6,20}/
     ),
-  role: Joi.string().valid("ADMIN", "CASHIER").required(),
+  // role: Joi.string().valid("admin", "cashier").required(),
 });
 
 
@@ -73,5 +73,5 @@ export const loginValidation = Joi.object({
 //     .regex(
 //       /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[\]{};':"\\|,.<>\/?])[A-Za-z\d!@#$%^&*()_\-+=\[\]{};':"\\|,.<>\/?]{6,20}/
 //     ).optional(),
-//   role: Joi.string().valid("ADMIN", "CASHIER").optional(), 
+//   role: Joi.string().valid("admin", "cashier").optional(), 
 // });

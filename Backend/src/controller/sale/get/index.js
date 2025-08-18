@@ -2,107 +2,103 @@ import prisma from "../../../db/db.js";
 import ApiError from "../../../utils/ApiError.js";
 import ApiResponse from "../../../utils/ApiResponse.js";
 
-//get All Sales
-export const getAllSales = async (req, res) => {
+export const getSales = async (req, res) => {
   try {
-    const sales = await prisma.sale.findMany({
-      include: {
-        saleItems: {
-          include: {
-            product: true,
-          },
-        },
-      },
-    });
+    let page = Number(req.query.page) || 1;
+    let limit = Number(req.query.limit) || 10;
+    if (page < 1) page = 1;
+    if (limit <= 0 || limit >= 100) limit = 10;
 
-    return ApiResponse(res, 200, sales, "Sales Fetched Successfully");
-  } catch (error) {
-    console.error("Error in getAllSales", error);
-    return ApiError(res, 500, "Internal Server Error");
-  }
-};
+    const skip = (page - 1) * limit;
 
-// Query - Search Sales
-export const saleSearch = async (req, res) => {
-  try {
+    // Filters from query
     const { q: name, startDate, endDate, customerName, paymentType, category } = req.query;
-
-    // At least one filter is required
-    if (!name && (!startDate || !endDate) && !customerName && !paymentType && !category) {
-      return ApiError(res, 400, null, "Provide at least one filter");
-    }
 
     let whereClause = {};
 
-    // Product Name
+    // Product Name filter
     if (name) {
-      whereClause.product = {
-        ...whereClause.product,
-        name: {
-          contains: name,
-          mode: "insensitive",
-        }
+      whereClause.saleItems = {
+        some: {
+          product: {
+            name: {
+              contains: name,
+              mode: "insensitive",
+            },
+          },
+        },
       };
     }
 
-    // Date Range
+    // Date Range filter
     if (startDate && endDate) {
       if (isNaN(Date.parse(startDate)) || isNaN(Date.parse(endDate))) {
         return ApiError(res, 400, null, "Invalid date format");
       }
-
-      whereClause.sale = {
-        ...whereClause.sale,
-        createdAt: {
-          gte: new Date(startDate),
-          lte: new Date(new Date(endDate).setHours(23, 59, 59, 999))
-        }
+      whereClause.createdAt = {
+        gte: new Date(startDate),
+        lte: new Date(new Date(endDate).setHours(23, 59, 59, 999)),
       };
     }
 
-    // Customer Name
+    // Customer Name filter
     if (customerName) {
-      whereClause.sale = {
-        ...whereClause.sale,
-        customerName: {
-          contains: customerName,
-          mode: "insensitive"
-        }
+      whereClause.customerName = {
+        contains: customerName,
+        mode: "insensitive",
       };
     }
 
-    // Payment Type
+    // Payment Type filter
     if (paymentType) {
-      whereClause.sale = {
-        ...whereClause.sale,
-        paymentType
-      };
+      whereClause.paymentType = paymentType;
     }
 
-    //  Product Category 
-    if (category) {
-      whereClause.product = {
-        ...whereClause.product,
+    // Product Category filter
+if (category) {
+  whereClause.saleItems = {
+    some: {
+      product: {
         category: {
-          equals: category,
-          mode: "insensitive"
+          is: {
+            name: {
+              contains: category,
+              mode: "insensitive",
+            }
+          }
         }
-      };
-    }
-
-    //Execute Query
-    const sales = await prisma.saleItem.findMany({
-      where: whereClause,
-      include: {
-        sale: true,
-        product: true // include full product info
       }
+    }
+  };
+}
+
+    // Fetch sales
+    const sales = await prisma.sale.findMany({
+      where: whereClause,
+      skip,
+      take: limit,
+      orderBy: {
+        createdAt: 'desc', // Newest first
+      },
+      include: {
+        saleItems: {
+          include: { product: true },
+        },
+      },
     });
 
-    return ApiResponse(res, 200, sales, "Search successful");
+    // Total count for pagination
+    const totalSales = await prisma.sale.count({ where: whereClause });
+    const totalPages = Math.ceil(totalSales / limit);
+
+    return ApiResponse(res, 200, sales, "Sales fetched successfully", {
+      totalPages,
+      currentPage: page,
+      limit,
+    });
 
   } catch (error) {
-    console.error("Search error:", error);
-    return ApiError(res, 500, null, "Internal server error");
+    console.error("Error in getSales:", error);
+    return ApiError(res, 500, null, "Internal Server Error");
   }
 };

@@ -10,24 +10,26 @@ datasource db {
 model User {
   id           Int      @id @default(autoincrement())
   email        String   @unique
-  createdAt    DateTime @default(now())
   password     String
-  resetToken String?
-  resetTokenExpiry DateTime?
   fullname     String
   profileImg   String?
   refreshToken String?
-  role         Role     @default(CASHIER)
+  resetToken String?
+  resetTokenExpiry DateTime?
+  role         Role     @default(cashier)
+  createdAt    DateTime @default(now())
   updatedAt    DateTime @default(now()) @updatedAt
-  //Sale         Sale[]
+  Sale         Sale[]
+  isDeleted    Boolean  @default(false)
 }
 
 model Category {
   id        Int       @id @default(autoincrement())
   name      String    @unique
+  products  Product[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  products  Product[]
+  isDeleted Boolean   @default(false)
 }
 
 model Product {
@@ -37,24 +39,27 @@ model Product {
   costPrice     Float
   stockQuantity Int
   unit          String?
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
   categoryId    Int
   category      Category   @relation(fields: [categoryId], references: [id])
   SaleItem      SaleItem[]
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @default(now()) @updatedAt
+  isDeleted     Boolean    @default(false)
 }
 
 model Sale {
   id            Int        @id @default(autoincrement())
-  //userId        Int
+  userId        Int
+  user          User       @relation(fields: [userId], references: [id])
   totalAmount   Float
   paymentType   String
-  createdAt     DateTime   @default(now())
   customerEmail String?
   customerName  String?
   customerPhone String?
-  //user          User       @relation(fields: [userId], references: [id])
   saleItems     SaleItem[]
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @default(now()) @updatedAt
+  isDeleted     Boolean    @default(false)
 }
 
 model SaleItem {
@@ -65,9 +70,12 @@ model SaleItem {
   priceAtSale Float
   product     Product @relation(fields: [productId], references: [id])
   sale        Sale    @relation(fields: [saleId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+  isDeleted   Boolean  @default(false)
 }
 
 enum Role {
-  ADMIN
-  CASHIER
+  admin
+  cashier
 }

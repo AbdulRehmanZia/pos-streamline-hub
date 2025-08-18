@@ -8,6 +8,16 @@ export const updateCategory = async (req, res) => {
     const categoryId = req.params.id;
     const { name } = req.body;
     if (!name) return ApiError(res, 400, "Name Is Required");
+    const normalizedName = name.trim().toLowerCase();
+    const existingCategory = await prisma.category.findFirst({
+      where: {
+        name: normalizedName,
+        NOT: { id: Number(req.params.id) },
+      },
+    });
+
+    if (existingCategory)
+      return ApiError(res, 400, "This Category Already Exists");
     const updatedCategory = await prisma.category.update({
       where: { id: Number(categoryId) },
       data: { name },

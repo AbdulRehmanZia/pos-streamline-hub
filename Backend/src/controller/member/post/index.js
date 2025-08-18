@@ -1,19 +1,19 @@
 import prisma from "../../../db/db.js";
 import ApiError from "../../../utils/ApiError.js";
 import ApiResponse from "../../../utils/ApiResponse.js";
-import {sendEmail} from "../../../services/email.service.js"
+import { sendEmail } from "../../../services/email.service.js";
 import { generateEmailTemplate } from "../../../services/email.service.js";
 import { registerMemberValidation } from "../../../utils/validationSchema.js";
 
 //register Store Member
 export const addStoreMember = async (req, res) => {
   try {
-    if (req.user.role !== "ADMIN") {
+    if (req.user.role !== "admin") {
       return ApiError(res, 403, "Only Admin Can Add Store Members");
     }
     const { error } = registerMemberValidation.validate(req.body);
     if (error) return ApiError(res, 400, error.details[0].message);
-    const { fullname, email, password, role } = req.body;
+    const { fullname, email, password } = req.body;
     const findMember = await prisma.user.findUnique({
       where: { email },
     });
@@ -24,7 +24,7 @@ export const addStoreMember = async (req, res) => {
         fullname,
         email,
         password,
-        role,
+        role: "cashier",
       },
     });
     const createdMember = await prisma.user.findUnique({
@@ -46,19 +46,18 @@ export const addStoreMember = async (req, res) => {
       );
 
     await sendEmail({
-  to: email,
-  subject: "🎉 Welcome to POS!",
-  message: generateEmailTemplate({
-    message: `
+      to: email,
+      subject: "🎉 Welcome to POS!",
+      message: generateEmailTemplate({
+        message: `
       <p>Hi <strong>${fullname}</strong>,</p>
       <p>Welcome to our POS system! Your account has been successfully created.</p>
       <p><strong>Email:</strong> ${email}<br />
       <strong>Password:</strong> ${password}</p>
       <p>Please keep this information safe.</p>
     `,
-  }),
-});
-
+      }),
+    });
 
     return ApiResponse(
       res,

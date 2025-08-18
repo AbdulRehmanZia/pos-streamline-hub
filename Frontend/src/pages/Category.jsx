@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
-import MemberTable from "../components/MemberTable";
-import { PlusCircle, Users } from "lucide-react";
+import CategoryTable from "../components/CategoryTable";
+import { PlusCircle, Tag } from "lucide-react";
 import {
   Sheet,
   SheetTrigger,
@@ -9,14 +9,14 @@ import {
   SheetTitle,
 } from "../components/ui/sheet";
 import { UserContext } from "../context/UserContext";
-import MemberForm from "../components/MemberForm";
+import CategoryForm from "../components/CategoryForm";
 
-export default function Member() {
+export default function Category() {
   const { user } = useContext(UserContext);
   const [refreshKey, setRefreshKey] = useState(0);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
-  const handleMemberAdded = () => {
+  const handleCategoryAdded = () => {
     setRefreshKey(prev => prev + 1);
     setIsSheetOpen(false); 
   };
@@ -27,11 +27,11 @@ export default function Member() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-[#2F4F4F] text-white">
-              <Users className="h-6 w-6" />
+              <Tag className="h-6 w-6" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-[#2F4F4F]">Team Members</h1>
-              <p className="text-[#2F4F4F]/80">Manage your store team members</p>
+              <h1 className="text-2xl font-bold text-[#2F4F4F]">Categories Management</h1>
+              <p className="text-[#2F4F4F]/80">Organize your products into categories</p>
             </div>
           </div>
 
@@ -40,22 +40,22 @@ export default function Member() {
               <SheetTrigger asChild>
                 <button className="inline-flex items-center px-4 py-2.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-[#2F4F4F] hover:bg-[#2F4F4F]/90 transition-colors">
                   <PlusCircle className="mr-2 h-5 w-5" />
-                  New Member
+                  New Category
                 </button>
               </SheetTrigger>
               <SheetContent side="right" className="w-full sm:max-w-md bg-[#F4F9F9]">
                 <SheetHeader className="mb-6">
                   <div className="flex items-center gap-3">
                     <div className="p-2 rounded-lg bg-[#2F4F4F] text-white">
-                      <Users className="h-6 w-6" />
+                      <Tag className="h-6 w-6" />
                     </div>
                     <SheetTitle className="text-xl font-bold text-[#2F4F4F]">
-                      New Team Member
+                      New Category
                     </SheetTitle>
                   </div>
                 </SheetHeader>
-                <MemberForm 
-                  onMemberAdded={handleMemberAdded}
+                <CategoryForm 
+                  onCategoryAdded={handleCategoryAdded}
                   onClose={() => setIsSheetOpen(false)}
                 />
               </SheetContent>
@@ -66,9 +66,9 @@ export default function Member() {
         <div className="bg-white rounded-lg border border-[#2F4F4F]/20 shadow-sm overflow-hidden">
           <div className="p-6">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold text-[#2F4F4F]">All Members</h2>
+              <h2 className="text-lg font-semibold text-[#2F4F4F]">All Categories</h2>
             </div>
-            <MemberTable refreshKey={refreshKey} />
+            <CategoryTable refreshKey={refreshKey} />
           </div>
         </div>
       </div>

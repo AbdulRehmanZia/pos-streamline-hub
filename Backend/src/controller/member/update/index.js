@@ -7,12 +7,10 @@ export const updateStoreMember = async (req, res) => {
   try {
     const userId = req.params.id;
 
-    const { fullname, email, password, role } = req.body;
+    const { fullname, email } = req.body;
     const updatedData = {};
     if (fullname !== undefined) updatedData.fullname = fullname;
     if (email !== undefined) updatedData.email = email;
-    if (password !== undefined) updatedData.password = password;
-    if (role != undefined) updatedData.role = role;
 
     if (Object.keys(updatedData).length === 0) {
       return ApiError(res, 400, "No valid fields provided for update");

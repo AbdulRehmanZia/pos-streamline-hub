@@ -2,7 +2,7 @@ import prisma from "../../../db/db.js";
 import ApiError from "../../../utils/ApiError.js";
 import ApiResponse from "../../../utils/ApiResponse.js";
 
-//Delete Sales
+// Delete Sale (soft delete)
 export const deleteSale = async (req, res) => {
   try {
     const saleId = req.params.id;
@@ -14,24 +14,19 @@ export const deleteSale = async (req, res) => {
       return ApiError(res, 404, null, "Sale not found");
     }
 
-    // Use transaction to delete related records first
     await prisma.$transaction(async (tx) => {
-      // First delete all related SaleItems
-      await tx.saleItem.deleteMany({
-        where: {
-          saleId: Number(saleId)
-        }
+      await tx.saleItem.updateMany({
+        where: { saleId: Number(saleId) },
+        data: { isDeleted: true },
       });
 
-      // Then delete the sale
-      await tx.sale.delete({
-        where: { 
-          id: Number(saleId) 
-        }
+      await tx.sale.update({
+        where: { id: Number(saleId) },
+        data: { isDeleted: true },
       });
     });
 
-    return ApiResponse(res, 200, null, "Sale successfully deleted");
+    return ApiResponse(res, 200, null, "Sale successfully deleted (soft)");
   } catch (error) {
     console.error("Sale Delete Error:", error);
     return ApiError(res, 500, error.message || "Internal Server Error");

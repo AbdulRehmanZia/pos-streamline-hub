@@ -1,165 +1,310 @@
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import React, { useState, useEffect } from "react";
+import { api } from "../Instance/api";
 import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { api } from "../Instance/BaseUrl"
-import { useState } from "react"
+  PlusCircle,
+  Trash2,
+  Loader,
+  CreditCard,
+  HandCoins,
+  Search,
+  X,
+} from "lucide-react";
+import toast from "react-hot-toast";
 
-export default function SaleForm({ onSaleAdded }) {
-  const [formData, setFormData] = useState({
-    paymentType: "CASH",
-    customerName: "",
-    customerEmail: "",
-    customerPhone: "",
-    items: [{ productId: "", quantity: "" }],
-  });
+function SaleForm({ onSaleAdded }) {
+  const [paymentType, setPaymentType] = useState("");
+  const [customerName, setCustomerName] = useState("");
+  const [customerEmail, setCustomerEmail] = useState("");
+  const [customerPhone, setCustomerPhone] = useState("");
+  const [items, setItems] = useState([{ productId: "", product: null, quantity: 1 }]);
+  const [loading, setLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [activeSearchIndex, setActiveSearchIndex] = useState(null);
 
-  const handleItemChange = (index, field, value) => {
-    const updatedItems = [...formData.items];
-    updatedItems[index][field] = value;
-    setFormData({ ...formData, items: updatedItems });
+  // Debounce search function
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchQuery.trim() && activeSearchIndex !== null) {
+        fetchProducts(searchQuery);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery, activeSearchIndex]);
+
+  const fetchProducts = async (query) => {
+    try {
+      setSearchLoading(true);
+      const res = await api.get(`admin/products?search=${query}`);
+      setSearchResults(res.data.data);
+    } catch (error) {
+      console.error("Error searching products", error);
+      toast.error("Failed to search products");
+    } finally {
+      setSearchLoading(false);
+    }
   };
 
-  const addItemField = () => {
-    setFormData({
-      ...formData,
-      items: [...formData.items, { productId: "", quantity: "" }],
-    });
+  const handleProductSelect = (product, index) => {
+    const updatedItems = [...items];
+    updatedItems[index] = {
+      ...updatedItems[index],
+      productId: product.id,
+      product: product
+    };
+    setItems(updatedItems);
+    setSearchQuery("");
+    setSearchResults([]);
+    setActiveSearchIndex(null);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
-      const formattedItems = formData.items.map((item) => ({
-        productId: Number(item.productId),
-        quantity: Number(item.quantity),
-      }));
-
-      const payload = { ...formData, items: formattedItems };
-
-      // Using the api instance from BaseUrl.js
-      const response = await api.post('sale/add-sale', payload, {
-        withCredentials: true,
-      });
-
-      if (response.data.success) {
-        alert("Sale Created Successfully!");
-        onSaleAdded?.(); 
-        // Reset form
-        setFormData({
-          paymentType: "CASH",
-          customerName: "",
-          customerEmail: "",
-          customerPhone: "",
-          items: [{ productId: "", quantity: "" }],
-        });
-      }
-    } catch (err) {
-      alert(err.response?.data?.message || "Error creating sale");
-      console.error(err);
+      const saleData = {
+        paymentType,
+        customerName,
+        customerEmail,
+        customerPhone,
+        items: items.map((item) => ({
+          productId: parseInt(item.productId, 10),
+          quantity: parseInt(item.quantity, 10),
+        })),
+      };
+      await api.post("/sales/add-sale", saleData);
+      onSaleAdded();
+      setPaymentType("");
+      setCustomerName("");
+      setCustomerEmail("");
+      setCustomerPhone("");
+      setItems([{ productId: "", product: null, quantity: 1 }]);
+    } catch (error) {
+      toast.error("Failed to complete sale");
+      console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
+  const addItemRow = () => {
+    setItems([...items, { productId: "", product: null, quantity: 1 }]);
+  };
+
+  const removeItemRow = (index) => {
+    if (items.length <= 1) return;
+    const updated = [...items];
+    updated.splice(index, 1);
+    setItems(updated);
+  };
+
+  const updateItem = (index, key, value) => {
+    const updated = [...items];
+    updated[index][key] = value;
+    setItems(updated);
+  };
+
+  const handleSearchFocus = (index) => {
+    setActiveSearchIndex(index);
+    if (items[index].productId) {
+      setSearchQuery(items[index].product?.name || "");
+    }
+  };
+
+  const clearSelection = (index) => {
+    const updatedItems = [...items];
+    updatedItems[index] = {
+      ...updatedItems[index],
+      productId: "",
+      product: null
+    };
+    setItems(updatedItems);
+    setSearchQuery("");
+  };
+
   return (
-    <div className="max-w-2xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold text-center mb-6">Create New Sale</h2>
+    <form onSubmit={handleSubmit} className="space-y-6 p-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-[#1C3333]">Customer Name</label>
+          <input
+            value={customerName}
+            onChange={(e) => setCustomerName(e.target.value)}
+            placeholder="Optional"
+            className="w-full px-3 py-2 border border-[#1C3333]/30 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1C3333] focus:border-[#1C3333] text-[#1C3333] bg-white"
+          />
+        </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid gap-4">
-          <div>
-            <Label>Customer Name</Label>
-            <Input
-              placeholder="Enter customer name" 
-              value={formData.customerName}
-              onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
-              className="mt-1"
-            />
-          </div>
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-[#1C3333]">Customer Email</label>
+          <input
+            type="email"
+            value={customerEmail}
+            onChange={(e) => setCustomerEmail(e.target.value)}
+            placeholder="Optional"
+            className="w-full px-3 py-2 border border-[#1C3333]/30 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1C3333] focus:border-[#1C3333] text-[#1C3333] bg-white"
+          />
+        </div>
 
-          <div>
-            <Label>Customer Email</Label>
-            <Input
-              type="email"
-              placeholder="Enter customer email"
-              value={formData.customerEmail}
-              onChange={(e) => setFormData({ ...formData, customerEmail: e.target.value })}
-              className="mt-1"
-            />
-          </div>
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-[#1C3333]">Customer Phone</label>
+          <input
+            value={customerPhone}
+            onChange={(e) => setCustomerPhone(e.target.value)}
+            placeholder="Optional"
+            className="w-full px-3 py-2 border border-[#1C3333]/30 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1C3333] focus:border-[#1C3333] text-[#1C3333] bg-white"
+          />
+        </div>
 
-          <div>
-            <Label>Customer Phone</Label>
-            <Input
-              placeholder="Enter customer phone"
-              value={formData.customerPhone}
-              onChange={(e) => setFormData({ ...formData, customerPhone: e.target.value })}
-              className="mt-1"
-            />
-          </div>
-
-          <div>
-            <Label>Payment Type</Label>
-            <Select
-              value={formData.paymentType}
-              onValueChange={(value) => setFormData({ ...formData, paymentType: value })}
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-[#1C3333]">Payment Type</label>
+          <div className="relative">
+            <select
+              value={paymentType}
+              onChange={(e) => setPaymentType(e.target.value)}
+              className="w-full px-3 py-2 border border-[#1C3333]/30 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1C3333] focus:border-[#1C3333] text-[#1C3333] bg-white appearance-none"
+              required
             >
-              <SelectTrigger className="mt-1">
-                <SelectValue placeholder="Select payment type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>Payment Type</SelectLabel>
-                  <SelectItem value="CASH">Cash</SelectItem>
-                  <SelectItem value="CARD">Card</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
+              <option value="">Payment type</option>
+              <option value="CASH">Cash</option>
+              <option value="CARD">Card</option>
+            </select>
+            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+              {paymentType === "CARD" ? (
+                <CreditCard className="h-5 w-5 text-[#1C3333]/70" />
+              ) : paymentType === "CASH" ? (
+                <HandCoins className="h-5 w-5 text-[#1C3333]/70" />
+              ) : (
+                <span className="text-[#1C3333]/70">⌄</span>
+              )}
+            </div>
           </div>
+        </div>
+      </div>
+
+      <div className="border-t border-[#1C3333]/20 pt-6">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-medium text-[#1C3333]">Items</h3>
+          <button
+            type="button"
+            onClick={addItemRow}
+            className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-[#1C3333] hover:bg-[#1C3333]/90 focus:outline-none focus:ring-2 focus:ring-[#1C3333]"
+          >
+            <PlusCircle className="mr-1 h-4 w-4" />
+            Add More Item
+          </button>
         </div>
 
         <div className="space-y-4">
-          <Label>Items</Label>
-          {formData.items.map((item, idx) => (
-            <div key={idx} className="grid grid-cols-2 gap-4">
-              <Input
-                type="number"
-                placeholder="Product ID"
-                value={item.productId}
-                onChange={(e) => handleItemChange(idx, "productId", e.target.value)}
-              />
-              <Input
-                type="number"
-                placeholder="Quantity"
-                value={item.quantity}
-                onChange={(e) => handleItemChange(idx, "quantity", e.target.value)}
-              />
+          {items.map((item, index) => (
+            <div key={index} className="flex gap-3 items-end">
+              <div className="flex-1 relative">
+                <label className="block text-sm font-medium text-[#1C3333]">Product</label>
+
+                {item.product ? (
+                  <div className="relative">
+                    <div className="w-full px-3 py-2 border border-[#1C3333]/30 rounded-md shadow-sm bg-[#F4F9F9]">
+                      <div className="flex justify-between items-center">
+                        <span className="text-[#1C3333] ">{item.product.name}</span>
+                        <span className="text-[#1C3333]/70 mr-4">${item.product.price.toFixed(2)}</span>
+                      </div>
+                    </div>
+                    <button
+                      type="button "
+                      onClick={() => clearSelection(index)}
+                      className="absolute right-2 top-2 text-[#1C3333]/50 hover:text-[#1C3333]"
+                    >
+                      <X className="h-4 w-4 mt-1 cursor-pointer" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="relative">
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Search className="h-5 w-5 text-[#1C3333]/50" />
+                      </div>
+                      <input
+                        type="text"
+                        placeholder="Search products..."
+                        value={activeSearchIndex === index ? searchQuery : ""}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onFocus={() => handleSearchFocus(index)}
+                        className="w-full pl-10 pr-3 py-2 border border-[#1C3333]/30 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1C3333] focus:border-[#1C3333] text-[#1C3333] bg-white"
+                      />
+                    </div>
+
+                    {activeSearchIndex === index && (searchQuery || searchResults.length > 0) && (
+                      <div className="absolute z-10 mt-1 w-full bg-white shadow-lg rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto max-h-60 focus:outline-none sm:text-sm">
+                        {searchLoading ? (
+                          <div className="px-4 py-2 text-[#1C3333]/70 flex items-center">
+                            <Loader className="animate-spin mr-2 h-4 w-4" />
+                            Searching...
+                          </div>
+                        ) : searchResults.length === 0 ? (
+                          <div className="px-4 py-2 text-[#1C3333]/70">No products found</div>
+                        ) : (
+                          searchResults.map((product) => (
+                            <div
+                              key={product.id}
+                              className="cursor-pointer hover:bg-[#F4F9F9] px-4 py-2 flex justify-between text-[#1C3333]"
+                              onClick={() => handleProductSelect(product, index)}
+                            >
+                              <span>{product.name}</span>
+                              <span className="text-[#1C3333]/70">${product.price.toFixed(2)}</span>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <div className="w-24">
+                <label className="block text-sm font-medium text-[#1C3333]">Quantity</label>
+                <input
+                  placeholder="Qty"
+                  type="number"
+                  min="1"
+                  value={item.quantity}
+                  onChange={(e) => updateItem(index, "quantity", e.target.value)}
+                  required
+                  className="w-full px-3 py-2 border border-[#1C3333]/30 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1C3333] focus:border-[#1C3333] text-[#1C3333] bg-white"
+                />
+              </div>
+
+              {items.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => removeItemRow(index)}
+                  className="mb-1 p-2 text-[#1C3333]/50 hover:text-red-500 rounded-md hover:bg-red-50"
+                >
+                  <Trash2 className="h-5 w-5" />
+                </button>
+              )}
             </div>
           ))}
-          <Button 
-            type="button" 
-            onClick={addItemField}
-            variant="outline" 
-            className="w-full bg-[#155dfc] !text-white hover:bg-blue-700"
-          >
-            Add Item
-          </Button>
         </div>
+      </div>
 
-        <Button 
-          type="submit" 
-          className="w-full bg-[#155dfc] !text-white hover:bg-blue-700"
-        >
-          Create Sale
-        </Button>
-      </form>
-    </div>
+      <button
+        type="submit"
+        disabled={loading}
+        className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#1C3333] hover:bg-[#1C3333]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1C3333] disabled:opacity-70 disabled:cursor-not-allowed transition-colors"
+      >
+        {loading ? (
+          <>
+            <Loader className="animate-spin mr-2 h-4 w-4" />
+            Processing...
+          </>
+        ) : (
+          "Add Sale"
+        )}
+      </button>
+    </form>
   );
 }
+
+export default SaleForm;

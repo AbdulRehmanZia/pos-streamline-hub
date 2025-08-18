@@ -39,6 +39,7 @@ export const loginUser = async (req, res) => {
         id: true,
         fullname: true,
         email: true,
+        role:true
       },
     });
 
@@ -46,7 +47,7 @@ export const loginUser = async (req, res) => {
       return ApiError(res, 500, "Something Went Wrong While Logging The User");
 
     const options = {
-      httpOnly: true,
+      // httpOnly: true,
       secure: true,
        maxAge: 7 * 24 * 60 * 60 * 1000 
     };
