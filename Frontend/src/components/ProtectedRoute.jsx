@@ -1,9 +1,17 @@
-import Cookies from "js-cookie"
-import { Navigate } from "react-router-dom"
-const ProtectedRoute = ({children})=>{
-const accessToken = Cookies.get("accessToken")
-if(!accessToken) return <Navigate to="/"/>
-return children
-}
+// src/components/ProtectedRoute.js
+import React, { useContext } from "react";
+import { Navigate, useLocation } from "react-router-dom";
+import { UserContext } from "../context/UserContext";
 
-export default ProtectedRoute
+const ProtectedRoute = ({ children }) => {
+  const { user } = useContext(UserContext);
+  const location = useLocation();
+
+  if (!user) {
+    return <Navigate to="/" state={{ from: location }} replace />;
+  }
+
+  return children;
+};
+
+export default ProtectedRoute;
