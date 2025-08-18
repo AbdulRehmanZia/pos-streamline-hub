@@ -1,9 +1,9 @@
 import React, { useContext, useEffect, useState } from "react";
 import { api } from "../Instance/api";
-import { Trash2, CreditCard, HandCoins, Loader, AlertCircle, ChevronLeft, ChevronRight } from "lucide-react";
+import { Trash2, CreditCard, HandCoins, Loader, AlertCircle, ChevronLeft, ChevronRight, Filter, X } from "lucide-react";
 import toast from "react-hot-toast";
 import { UserContext } from "../context/UserContext";
-import ConfirmModal from "./ConfirmModal"; // ✅ import your new modal
+import ConfirmModal from "./ConfirmModal";
 
 export default function SalesTable({ refresh }) {
   const { user } = useContext(UserContext);
@@ -17,7 +17,17 @@ export default function SalesTable({ refresh }) {
     totalItems: 0
   });
 
-  // Modal state
+  // Filter states
+  const [filters, setFilters] = useState({
+    q: "", 
+    startDate: "",
+    endDate: "",
+    customerName: "",
+    paymentType: "",
+    category: ""
+  });
+  const [showFilters, setShowFilters] = useState(false);
+
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [saleToDelete, setSaleToDelete] = useState(null);
 
@@ -25,7 +35,19 @@ export default function SalesTable({ refresh }) {
     try {
       setLoading(true);
       setError(null);
-      const res = await api.get(`/sales?page=${pagination.page}&limit=${pagination.limit}`);
+      
+      const queryParams = new URLSearchParams({
+        page: pagination.page.toString(),
+        limit: pagination.limit.toString(),
+      });
+
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value && value.trim() !== '') {
+          queryParams.append(key, value);
+        }
+      });
+
+      const res = await api.get(`/sales?${queryParams.toString()}`);
       setSales(res.data.data);
       setPagination(prev => ({
         ...prev,
@@ -40,6 +62,29 @@ export default function SalesTable({ refresh }) {
       setLoading(false);
     }
   };
+
+  const handleFilterChange = (key, value) => {
+    setFilters(prev => ({
+      ...prev,
+      [key]: value
+    }));
+    // Reset to first page when filters change
+    setPagination(prev => ({ ...prev, page: 1 }));
+  };
+
+  const clearFilters = () => {
+    setFilters({
+      q: "",
+      startDate: "",
+      endDate: "",
+      customerName: "",
+      paymentType: "",
+      category: ""
+    });
+    setPagination(prev => ({ ...prev, page: 1 }));
+  };
+
+  const hasActiveFilters = Object.values(filters).some(value => value && value.trim() !== '');
 
   const handleDeleteClick = (id) => {
     setSaleToDelete(id);
@@ -79,9 +124,13 @@ export default function SalesTable({ refresh }) {
     setPagination(prev => ({ ...prev, limit: newLimit, page: 1 }));
   };
 
+  // Debounce effect for filters
   useEffect(() => {
-    fetchSales();
-  }, [refresh, pagination.page, pagination.limit]);
+    const timer = setTimeout(() => {
+      fetchSales();
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [refresh, pagination.page, pagination.limit, filters]);
 
   if (loading) {
     return (
@@ -109,6 +158,121 @@ export default function SalesTable({ refresh }) {
   return (
     <>
       <div className="bg-white rounded-lg border border-[#1C3333]/20 overflow-hidden">
+        {/* Filter Controls */}
+        <div className="px-4 py-3 border-b border-[#1C3333]/20 bg-[#F4F9F9]">
+          <div className="flex items-center justify-between mb-3">
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className="flex items-center gap-2 px-3 py-2 text-sm text-[#1C3333] border border-[#1C3333]/30 rounded-md hover:bg-[#1C3333]/10"
+            >
+              <Filter className="h-4 w-4" />
+              Filters
+              {hasActiveFilters && (
+                <span className="bg-[#1C3333] text-white text-xs px-2 py-0.5 rounded-full">
+                  {Object.values(filters).filter(v => v && v.trim() !== '').length}
+                </span>
+              )}
+            </button>
+            {hasActiveFilters && (
+              <button
+                onClick={clearFilters}
+                className="flex items-center gap-2 px-3 py-2 text-sm text-[#FF6F61] hover:bg-[#FF6F61]/10 rounded-md"
+              >
+                <X className="h-4 w-4" />
+                Clear Filters
+              </button>
+            )}
+          </div>
+
+          {showFilters && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4 bg-white rounded-md border border-[#1C3333]/20">
+              {/* Product Name Filter */}
+              <div>
+                <label className="block text-sm font-medium text-[#1C3333] mb-1">
+                  Product Name
+                </label>
+                <input
+                  type="text"
+                  placeholder="Search by product name..."
+                  value={filters.q}
+                  onChange={(e) => handleFilterChange('q', e.target.value)}
+                  className="w-full px-3 py-2 border border-[#1C3333]/30 rounded-md text-sm focus:ring-2 focus:ring-[#1C3333] focus:border-[#1C3333]"
+                />
+              </div>
+
+              {/* Customer Name Filter */}
+              <div>
+                <label className="block text-sm font-medium text-[#1C3333] mb-1">
+                  Customer Name
+                </label>
+                <input
+                  type="text"
+                  placeholder="Search by customer name..."
+                  value={filters.customerName}
+                  onChange={(e) => handleFilterChange('customerName', e.target.value)}
+                  className="w-full px-3 py-2 border border-[#1C3333]/30 rounded-md text-sm focus:ring-2 focus:ring-[#1C3333] focus:border-[#1C3333]"
+                />
+              </div>
+
+              {/* Payment Type Filter */}
+              <div>
+                <label className="block text-sm font-medium text-[#1C3333] mb-1">
+                  Payment Type
+                </label>
+                <select
+                  value={filters.paymentType}
+                  onChange={(e) => handleFilterChange('paymentType', e.target.value)}
+                  className="w-full px-3 py-2 border border-[#1C3333]/30 rounded-md text-sm focus:ring-2 focus:ring-[#1C3333] focus:border-[#1C3333]"
+                >
+                  <option value="">All Payment Types</option>
+                  <option value="CASH">Cash</option>
+                  <option value="CARD">Card</option>
+                </select>
+              </div>
+
+              {/* Start Date Filter */}
+              <div>
+                <label className="block text-sm font-medium text-[#1C3333] mb-1">
+                  From Date
+                </label>
+                <input
+                  type="date"
+                  value={filters.startDate}
+                  onChange={(e) => handleFilterChange('startDate', e.target.value)}
+                  className="w-full px-3 py-2 border border-[#1C3333]/30 rounded-md text-sm focus:ring-2 focus:ring-[#1C3333] focus:border-[#1C3333]"
+                />
+              </div>
+
+              {/* End Date Filter */}
+              <div>
+                <label className="block text-sm font-medium text-[#1C3333] mb-1">
+                  To Date
+                </label>
+                <input
+                  type="date"
+                  value={filters.endDate}
+                  onChange={(e) => handleFilterChange('endDate', e.target.value)}
+                  className="w-full px-3 py-2 border border-[#1C3333]/30 rounded-md text-sm focus:ring-2 focus:ring-[#1C3333] focus:border-[#1C3333]"
+                />
+              </div>
+
+              {/* Category Filter */}
+              <div>
+                <label className="block text-sm font-medium text-[#1C3333] mb-1">
+                  Product Category
+                </label>
+                <input
+                  type="text"
+                  placeholder="Search by category..."
+                  value={filters.category}
+                  onChange={(e) => handleFilterChange('category', e.target.value)}
+                  className="w-full px-3 py-2 border border-[#1C3333]/30 rounded-md text-sm focus:ring-2 focus:ring-[#1C3333] focus:border-[#1C3333]"
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* Pagination Controls */}
         <div className="px-4 py-3 flex items-center justify-between border-b border-[#1C3333]/20 bg-[#F4F9F9]">
           <div className="flex items-center space-x-2">
@@ -199,6 +363,9 @@ export default function SalesTable({ refresh }) {
             <thead className="bg-[#F4F9F9]">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-[#1C3333] uppercase tracking-wider">
+                  Date
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-[#1C3333] uppercase tracking-wider">
                   Customer
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-[#1C3333] uppercase tracking-wider">
@@ -220,6 +387,14 @@ export default function SalesTable({ refresh }) {
             <tbody className="bg-white divide-y divide-[#1C3333]/20">
               {sales.map((sale) => (
                 <tr key={sale.id} className="hover:bg-[#F4F9F9]">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-[#1C3333]">
+                      {new Date(sale.createdAt).toLocaleDateString()}
+                    </div>
+                    <div className="text-xs text-[#1C3333]/70">
+                      {new Date(sale.createdAt).toLocaleTimeString()}
+                    </div>
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
                       <p className="text-sm font-medium text-[#1C3333]">{sale.customerName || "Walk-in"}</p>
@@ -277,8 +452,12 @@ export default function SalesTable({ refresh }) {
             <div className="bg-[#1C3333]/10 w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-3">
               <CreditCard className="h-6 w-6 text-[#1C3333]" />
             </div>
-            <h3 className="text-base font-medium text-[#1C3333]">No sales yet</h3>
-            <p className="text-[#1C3333]/70 text-sm">Create your first sale</p>
+            <h3 className="text-base font-medium text-[#1C3333]">
+              {hasActiveFilters ? "No sales found" : "No sales yet"}
+            </h3>
+            <p className="text-[#1C3333]/70 text-sm">
+              {hasActiveFilters ? "Try adjusting your filters" : "Create your first sale"}
+            </p>
           </div>
         )}
       </div>
@@ -293,5 +472,4 @@ export default function SalesTable({ refresh }) {
       />
     </>
   );
-
 }

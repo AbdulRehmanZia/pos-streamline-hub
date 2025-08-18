@@ -14,20 +14,19 @@ export const getAllProducts = async (req, res) => {
 
   try {
     const whereClause = {
+      isDeleted: false, 
       name: {
         contains: search,
-        mode: 'insensitive'
-      }
+        mode: 'insensitive',
+      },
     };
 
     const allProduct = await prisma.product.findMany({
       where: whereClause,
-      skip: skip,
+      skip,
       take: limit,
       include: { category: true },
-       orderBy: {
-        createdAt: 'desc', // Newest first
-      },
+      orderBy: { createdAt: 'desc' },
     });
 
     const totalProducts = await prisma.product.count({ where: whereClause });
@@ -38,13 +37,10 @@ export const getAllProducts = async (req, res) => {
       200,
       allProduct,
       "All Products retrieved successfully",
-      {
-        totalPages,
-        currentPage: page,
-        limit,
-      }
+      { totalPages, currentPage: page, limit }
     );
   } catch (error) {
-    return ApiError(res, 500, error, "Internal Server Error");
+    console.error("Error in getAllProducts:", error);
+    return ApiError(res, 500, "Internal Server Error", error);
   }
 };

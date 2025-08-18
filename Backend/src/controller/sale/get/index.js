@@ -55,18 +55,22 @@ export const getSales = async (req, res) => {
     }
 
     // Product Category filter
-    if (category) {
-      whereClause.saleItems = {
-        some: {
-          product: {
-            category: {
-              equals: category,
+if (category) {
+  whereClause.saleItems = {
+    some: {
+      product: {
+        category: {
+          is: {
+            name: {
+              contains: category,
               mode: "insensitive",
-            },
-          },
-        },
-      };
+            }
+          }
+        }
+      }
     }
+  };
+}
 
     // Fetch sales
     const sales = await prisma.sale.findMany({

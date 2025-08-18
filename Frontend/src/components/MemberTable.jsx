@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import { api } from "../Instance/api";
 import { Trash2, Edit, Loader, AlertCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import toast from "react-hot-toast";
@@ -29,29 +29,58 @@ export default function MemberTable({ refreshKey }) {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [memberToDelete, setMemberToDelete] = useState(null);
 
-  const fetchMembers = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const res = await api.get(
-        `/admin/members?page=${pagination.page}&limit=${pagination.limit}&search=${searchTerm}`
-      );
-      setMembers(res.data.data);
-      console.log("Members: ",members);
-      
-      setPagination(prev => ({
-        ...prev,
-        totalPages: res.data.meta?.totalPages || 1,
-        totalItems: res.data.meta?.totalItems || res.data.data.length
-      }));
-    } catch (error) {
-      console.error("Error fetching members", error);
-      setError("Failed to load members");
-      toast.error("Failed to load members");
-    } finally {
-      setLoading(false);
+ const fetchMembers = useCallback(async () => {
+  try {
+    setLoading(true);
+    setError(null);
+
+    const res = await api.get(
+  `user/?page=${pagination.page}&limit=${pagination.limit}&search=${searchTerm}`
+);
+
+    // Debugging log
+    console.log("API Response:", res);
+    console.log("Search Term Sent:", searchTerm);
+console.log("Response:", res.data);
+
+
+    if (!res || !res.data) {
+      throw new Error("Invalid API response structure");
     }
-  };
+
+    // Extract from ApiResponse structure
+    const membersData = Array.isArray(res.data.data) ? res.data.data : [];
+    const meta = res.data.meta || {};
+
+    setMembers(membersData);
+    setPagination(prev => ({
+      ...prev,
+      totalPages: meta.totalPages || 1,
+      totalItems: meta.totalUsers || membersData.length
+    }));
+  } catch (error) {
+    console.error("Error fetching members", error);
+    setError("Failed to load members");
+    toast.error("Failed to load members");
+    setMembers([]); 
+  } finally {
+    setLoading(false);
+  }
+}, [pagination.page, pagination.limit, searchTerm]);
+
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchMembers();
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [refreshKey, pagination.page, pagination.limit, searchTerm, fetchMembers]);
+
+  useEffect(() => {
+    if (members.length === 0 && pagination.page > 1) {
+      setPagination(prev => ({ ...prev, page: prev.page - 1 }));
+    }
+  }, [members.length, pagination.page]);
 
   const handleDeleteClick = (id) => {
     setMemberToDelete(id);
@@ -62,20 +91,22 @@ export default function MemberTable({ refreshKey }) {
     try {
       await api.delete(`/admin/members/delete-member/${memberToDelete}`);
       toast.success("Member deleted successfully");
+      
+      // Optimistic update
       setMembers(prev => prev.filter(member => member.id !== memberToDelete));
       setPagination(prev => ({
         ...prev,
         totalItems: prev.totalItems - 1
       }));
-      if (members.length === 1 && pagination.page > 1) {
-        setPagination(prev => ({ ...prev, page: prev.page - 1 }));
-      }
+      
+      fetchMembers();
+      
       setDeleteModalOpen(false);
       setMemberToDelete(null);
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to delete member");
       console.error("Error deleting member", error);
-      fetchMembers();
+      fetchMembers(); // Refresh data on error
       setDeleteModalOpen(false);
     }
   };
@@ -100,13 +131,6 @@ export default function MemberTable({ refreshKey }) {
     setSelectedMember(member);
     setIsEditSheetOpen(true);
   };
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      fetchMembers();
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [refreshKey, pagination.page, pagination.limit, searchTerm]);
 
   if (loading) {
     return (
@@ -221,75 +245,61 @@ export default function MemberTable({ refreshKey }) {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-[#1C3333]/20">
-            {members.map((member) => (
-              <tr key={member.id} className="hover:bg-[#F4F9F9]">
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-[#1C3333]">{member.fullname}</div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-[#1C3333]">{member.email}</div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-[#1C3333]">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      member.role === 'admin' 
-                        ? 'bg-[#1C3333] text-white' 
-                        : 'bg-[#1C3333]/10 text-[#1C3333]'
-                    }`}>
-                      {member.role}
-                    </span>
-                  </div>
-                </td>
-                {user?.role === "admin" && (
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <div className="flex justify-end space-x-2">
-                      <button
-                        onClick={() => handleEditClick(member)}
-                        className="text-[#1C3333] hover:text-[#1C3333]/70 p-1 rounded-md hover:bg-[#1C3333]/10"
-                      >
-                        <Edit className="h-5 w-5" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteClick(member.id)}
-                        disabled={member.role === 'admin'} 
-                        className={`p-1 rounded-md hover:bg-[#FF6F61]/10 ${
-                          member.role === 'admin' 
-                            ? 'text-gray-400 cursor-not-allowed' 
-                            : 'text-[#FF6F61] hover:text-[#FF6F61]/80'
-                        }`}
-                      >
-                        <Trash2 className="h-5 w-5" />
-                      </button>
+            {Array.isArray(members) && members.length > 0 ? (
+              members.map((member) => (
+                <tr key={member.id} className="hover:bg-[#F4F9F9]">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm font-medium text-[#1C3333]">{member.fullname}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-[#1C3333]">{member.email}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-[#1C3333]">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        member.role === 'admin' 
+                          ? 'bg-[#1C3333] text-white' 
+                          : 'bg-[#1C3333]/10 text-[#1C3333]'
+                      }`}>
+                        {member.role}
+                      </span>
                     </div>
                   </td>
-                )}
+                  {user?.role === "admin" && (
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <div className="flex justify-end space-x-2">
+                        <button
+                          onClick={() => handleEditClick(member)}
+                          className="text-[#1C3333] hover:text-[#1C3333]/70 p-1 rounded-md hover:bg-[#1C3333]/10"
+                        >
+                          <Edit className="h-5 w-5" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteClick(member.id)}
+                          disabled={member.role === 'admin'} 
+                          className={`p-1 rounded-md hover:bg-[#FF6F61]/10 ${
+                            member.role === 'admin' 
+                              ? 'text-gray-400 cursor-not-allowed' 
+                              : 'text-[#FF6F61] hover:text-[#FF6F61]/80'
+                          }`}
+                        >
+                          <Trash2 className="h-5 w-5" />
+                        </button>
+                      </div>
+                    </td>
+                  )}
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={user?.role === "admin" ? 4 : 3} className="py-4 text-center text-[#1C3333]/70">
+                  No members found
+                </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
-
-      {members.length === 0 && !loading && (
-        <div className="text-center py-10">
-          <div className="bg-[#1C3333]/10 w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-3">
-            <svg
-              className="h-6 w-6 text-[#1C3333]"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-              />
-            </svg>
-          </div>
-          <h3 className="text-base font-medium text-[#1C3333]">No members yet</h3>
-          <p className="text-[#1C3333]/70 text-sm">Add your first team member</p>
-        </div>
-      )}
 
       <ConfirmModal
         open={deleteModalOpen}

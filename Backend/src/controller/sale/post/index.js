@@ -141,14 +141,19 @@ export const addSale = async (req, res) => {
 
       // 5️⃣ Create sale & items in one go
       return await tx.sale.create({
-        data: {
-          paymentType,
-          totalAmount,
-          customerName,
-          customerEmail,
-          customerPhone,
-          saleItems: { create: saleItemData },
-        },
+       data: {
+    paymentType,
+    totalAmount,
+    customerName,
+    customerEmail,
+    customerPhone,
+    saleItems: { create: saleItemData },
+    user: {
+      connect: {
+        id: req.user.id // Assuming you have user info in request
+      }
+    }
+  },
         include: {
           saleItems: { include: { product: true } },
         },

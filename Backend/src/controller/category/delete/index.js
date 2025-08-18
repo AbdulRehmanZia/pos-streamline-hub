@@ -2,16 +2,36 @@ import prisma from "../../../db/db.js";
 import ApiError from "../../../utils/ApiError.js";
 import ApiResponse from "../../../utils/ApiResponse.js";
 
-//Delete category
+// Delete Category (soft delete)
 export const deleteCategory = async (req, res) => {
   try {
     const categoryId = req.params.id;
-    await prisma.category.delete({
+
+    const categoryExist = await prisma.category.findUnique({
       where: { id: Number(categoryId) },
     });
-    return ApiResponse(res, 200, null, "Category Deleted Successfully");
+
+    if (!categoryExist) {
+      return ApiError(res, 404, null, "Category not found");
+    }
+
+    await prisma.$transaction(async (tx) => {
+      // Soft delete all products under this category
+      await tx.product.updateMany({
+        where: { categoryId: Number(categoryId) },
+        data: { isDeleted: true },
+      });
+
+      // Soft delete category
+      await tx.category.update({
+        where: { id: Number(categoryId) },
+        data: { isDeleted: true },
+      });
+    });
+
+    return ApiResponse(res, 200, null, "Category deleted successfully (soft)");
   } catch (error) {
     console.error("Error in deleteCategory:", error);
-    return ApiError(res, 500, "Internal Server Error", error);
+    return ApiError(res, 500, error.message || "Internal Server Error");
   }
 };
