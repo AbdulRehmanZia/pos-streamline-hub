@@ -1,4 +1,5 @@
 import React, { useContext, useState, useEffect } from "react";
+import loader from "../../dist/loader.svg";
 import { UserContext } from "../context/UserContext";
 import {
   ShoppingCart,
@@ -43,16 +44,21 @@ export default function Dashboard() {
   if (!analyst) {
     return (
       <div className="p-6">
-        <h1 className="text-2xl font-bold mb-6">
-          Welcome back, {user.fullname}
+        {/* 🔹 Header */}
+        <h1 className="text-2xl font-bold mb-6 text-left">
+          Welcome , {user.fullname}
         </h1>
-        <p className="text-gray-500">Loading analytics...</p>
+
+        {/* 🔹 Loader Centered */}
+        <div className="flex justify-center items-center h-[70vh]">
+          <img src={loader} alt="Loading..." className="h-20" />
+        </div>
       </div>
     );
   }
 
-  // ✅ Graph data fix
-  const COLORS = ["#4f46e5", "#10b981", "#f59e0b", "#ef4444"];
+  //  Graph data
+  const COLORS = ["#2D6964", "#343965", "#478985", "#02323D"];
 
   // Category wise products (Bar Chart)
   const categoryData = analyst.categoryWiseProductCount.map((d) => ({
@@ -112,7 +118,10 @@ export default function Dashboard() {
           <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Category Wise Products (Bar Chart) */}
             <div className="bg-white shadow-lg rounded-2xl p-4">
-              <h2 className="text-lg font-bold mb-4">📊 Category Wise Products</h2>
+              <h2 className="text-lg font-bold mb-4">
+                {" "}
+                Category Wise Products
+              </h2>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={categoryData}>
                   <CartesianGrid strokeDasharray="3 3" />
@@ -120,14 +129,14 @@ export default function Dashboard() {
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Bar dataKey="products" fill="#4f46e5" />
+                  <Bar dataKey="products" fill="#2D4E43" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
 
             {/* Sales Summary (Line Chart) */}
             <div className="bg-white shadow-lg rounded-2xl p-4">
-              <h2 className="text-lg font-bold mb-4">📈 Sales Summary</h2>
+              <h2 className="text-lg font-bold mb-4"> Sales Summary</h2>
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={salesData}>
                   <CartesianGrid strokeDasharray="3 3" />
@@ -135,38 +144,43 @@ export default function Dashboard() {
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Line type="monotone" dataKey="value" stroke="#10b981" />
+                  <Line type="monotone" dataKey="value" stroke="#1c3333" />
                 </LineChart>
               </ResponsiveContainer>
             </div>
 
             {/* Sales Distribution (Pie Chart) */}
             <div className="bg-white shadow-lg rounded-2xl p-4 col-span-1 md:col-span-2">
-              <h2 className="text-lg font-bold mb-4">🥧 Sales Distribution</h2>
-              <ResponsiveContainer width="100%" height={350}>
-                <PieChart>
-                  <Pie
-                    data={salesData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    outerRadius={120}
-                    dataKey="value"
-                    label={({ name, percent }) =>
-                      `${name} ${(percent * 100).toFixed(0)}%`
-                    }
-                  >
-                    {salesData.map((_, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={COLORS[index % COLORS.length]}
-                      />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
+              <h2 className="text-lg font-bold mb-4"> Sales Distribution</h2>
+
+              {analyst?.totalProducts > 0 || analyst?.totalSaleItems > 0 ? (
+                <ResponsiveContainer width="100%" height={350}>
+                  <PieChart>
+                    <Pie
+                      data={[
+                        { name: "Products", value: analyst.totalProducts },
+                        { name: "Sale Items", value: analyst.totalSaleItems },
+                      ]}
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={130}
+                      dataKey="value"
+                      label={({ name, percent }) =>
+                        `${name} ${(percent * 100).toFixed(0)}%`
+                      }
+                    >
+                      <Cell fill="#2D6964" />
+                      <Cell fill="#343965" />
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : (
+                <p className="text-center text-gray-500">
+                  No distribution data available
+                </p>
+              )}
             </div>
           </div>
 
@@ -177,7 +191,7 @@ export default function Dashboard() {
               {recentActivities.map((activity) => (
                 <div key={activity.id} className="flex items-start">
                   <div className="bg-blue-100 p-2 rounded-full mr-3">
-                    <Activity className="h-4 w-4 text-blue-600" />
+                    <Activity className="h-5 w-4 text-blue-600" />
                   </div>
                   <div>
                     <p className="font-medium">{activity.action}</p>
