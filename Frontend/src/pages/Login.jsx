@@ -37,6 +37,7 @@ const Login = () => {
       localStorage.setItem("accessToken", accessToken);
       toast.success("Login successful!");
       navigate("/dashboard");
+
     } catch (error) {
       console.error("Login error details:", error);
       const errMsg = error.response?.data?.message || "Login failed. Please try again.";
@@ -117,7 +118,7 @@ const Login = () => {
             <div className="flex items-center justify-between">
               <button
                 type="button"
-                onClick={() => navigate("/forgetpassword")}
+                onClick={() => navigate("/forget-password")}
                 className="text-sm text-[#1C3333] hover:text-[#1C3333]/70 hover:underline focus:outline-none"
               >
                 Forgot password?

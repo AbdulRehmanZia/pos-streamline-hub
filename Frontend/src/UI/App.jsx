@@ -1,6 +1,6 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import { Toaster } from "react-hot-toast"; 
+import { Toaster } from "react-hot-toast";
 import Sidebar from "../components/SideBar";
 import Product from "../pages/Product";
 import Sales from "../pages/Sale";
@@ -9,13 +9,20 @@ import Category from "../pages/Category";
 import Member from "../pages/Member";
 import ProtectedRoute from "../components/ProtectedRoute";
 import Login from "../pages/Login";
+import ForgetPassword from "../pages/ForgetPassword";
+import ResetPassword from "../pages/ResetPassword";
 
 function App() {
   return (
     <>
       <Toaster position="top-right" reverseOrder={false} />
       <Routes>
+        {/* Public route */}
         <Route path="/" element={<Login />} />
+        <Route path="/forget-password" element={<ForgetPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+
+        {/* Protected route */}
         <Route
           path="/dashboard"
           element={
@@ -30,6 +37,8 @@ function App() {
           <Route path="member" element={<Member />} />
           <Route path="sale" element={<Sales />} />
         </Route>
+
+        <Route path="*" element={<Login />} />
       </Routes>
     </>
   );

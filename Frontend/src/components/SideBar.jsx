@@ -14,6 +14,8 @@ import { UserContext } from "../context/UserContext";
 
 export default function SideBar() {
   const { user, logout } = useContext(UserContext);
+  console.log("User role:", user?.role);
+
   const [isOpen, setIsOpen] = useState(true);
   const location = useLocation();
   const navigate = useNavigate();
@@ -22,26 +24,31 @@ export default function SideBar() {
     {
       name: "Dashboard",
       path: "/dashboard",
+      roles: ["admin", "cashier"],
       icon: <ChartBarIcon className="h-6 w-6" />,
     },
     {
       name: "Sales",
       path: "/dashboard/sale",
+      roles: ["admin", "cashier"],
       icon: <RectangleStackIcon className="h-6 w-6" />,
     },
     {
       name: "Product",
       path: "/dashboard/product",
+      roles: ["admin", "cashier"],
       icon: <ShoppingBagIcon className="h-6 w-6" />,
     },
     {
       name: "Category",
+      roles: ["admin", "cashier"],
       path: "/dashboard/category",
       icon: <TagIcon className="h-6 w-6" />,
     },
     {
       name: "Member",
       path: "/dashboard/member",
+      roles: ["admin"],
       icon: <RiTeamLine className="h-6 w-6" />,
     },
   ];
@@ -96,25 +103,28 @@ export default function SideBar() {
             Main
           </p>
 
-          {navItems.map((item) => {
-            const isActive = location.pathname === item.path;
-            return (
-              <Link
-                key={item.name}
-                to={item.path}
-                title={!isOpen ? item.name : ""}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200
-                ${
-                  isActive
-                    ? "bg-[#F4F9F9] text-[#1C3333] shadow-md border-l-4 border-[#FFB703]"
-                    : "text-[#F4F9F9] hover:bg-[#F4F9F9]/20"
-                }`}
-              >
-                {item.icon}
-                {isOpen && <span>{item.name}</span>}
-              </Link>
-            );
-          })}
+          {navItems
+  .filter(item => item.roles.includes(user?.role)) // ✅ only show items the role is allowed to see
+  .map((item) => {
+    const isActive = location.pathname === item.path;
+    return (
+      <Link
+        key={item.name}
+        to={item.path}
+        title={!isOpen ? item.name : ""}
+        className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200
+          ${
+            isActive
+              ? "bg-[#F4F9F9] text-[#1C3333] shadow-md border-l-4 border-[#FFB703]"
+              : "text-[#F4F9F9] hover:bg-[#F4F9F9]/20"
+          }`}
+      >
+        {item.icon}
+        {isOpen && <span>{item.name}</span>}
+      </Link>
+    );
+  })}
+
         </nav>
 
         {/* Logout Button */}

@@ -1,9 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
 import { api } from "../Instance/api";
-import { Trash2, CreditCard, HandCoins, Loader, AlertCircle, ChevronLeft, ChevronRight, Filter, X } from "lucide-react";
+import { Trash2, CreditCard, HandCoins, Loader, AlertCircle, ChevronLeft, ChevronRight, Filter, X, Download } from "lucide-react";
 import toast from "react-hot-toast";
 import { UserContext } from "../context/UserContext";
 import ConfirmModal from "./ConfirmModal";
+import { PDFDownloadLink } from '@react-pdf/renderer';
+import InvoiceTemplate from './InvoiceTemplate.jsx';
 
 export default function SalesTable({ refresh }) {
   const { user } = useContext(UserContext);
@@ -49,6 +51,8 @@ export default function SalesTable({ refresh }) {
 
       const res = await api.get(`/sales?${queryParams.toString()}`);
       setSales(res.data.data);
+      console.log("Sales=>", res.data.data);
+      
       setPagination(prev => ({
         ...prev,
         totalPages: res.data.meta?.totalPages || 1,
@@ -330,7 +334,6 @@ export default function SalesTable({ refresh }) {
                   </button>
                 );
               })}
-              {/* Ellipsis and last page */}
               {pagination.totalPages > 5 && pagination.page < pagination.totalPages - 2 && (
                 <span className="px-2 text-[#1C3333]">...</span>
               )}
@@ -376,6 +379,9 @@ export default function SalesTable({ refresh }) {
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-[#1C3333] uppercase tracking-wider">
                   Items
+                </th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-[#1C3333] uppercase tracking-wider">
+                  Invoice
                 </th>
                 {user?.role === "admin" && (
                   <th className="px-6 py-3 text-right text-xs font-medium text-[#1C3333] uppercase tracking-wider">
@@ -428,6 +434,18 @@ export default function SalesTable({ refresh }) {
                         </div>
                       ))}
                     </div>
+                  </td>
+                  <td className="mt-3  py-4 whitespace-nowrap text-center flex justify-center text-sm font-medium">
+                    <PDFDownloadLink
+                      document={<InvoiceTemplate sale={sale} />}
+                      fileName={`invoice_${sale.id}.pdf`}
+                      className="text-[#1C3333] hover:text-[#1C3333]/80 p-1 rounded-md hover:bg-[#1C3333]/10"
+                      title="Download invoice"
+                    >
+                      {({ loading }) => (
+                        loading ? <Loader className="h-5 w-5 animate-spin" /> : <Download className="h-5 w-5" />
+                      )}
+                    </PDFDownloadLink>
                   </td>
                   {user?.role === "admin" && (
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
