@@ -8,11 +8,10 @@ import {
   HandCoins,
   Search,
   X,
-  Download,
 } from "lucide-react";
 import toast from "react-hot-toast";
-import { PDFDownloadLink } from '@react-pdf/renderer';
-import InvoiceTemplate from './InvoiceTemplate.jsx';
+import { pdf } from "@react-pdf/renderer";   // ✅ for generating PDF
+import InvoiceTemplate from "./InvoiceTemplate.jsx";
 
 function SaleForm({ onSaleAdded }) {
   const [paymentType, setPaymentType] = useState("");
@@ -26,7 +25,6 @@ function SaleForm({ onSaleAdded }) {
   const [searchLoading, setSearchLoading] = useState(false);
   const [activeSearchIndex, setActiveSearchIndex] = useState(null);
   const [generatePDF, setGeneratePDF] = useState(false);
-  const [saleData, setSaleData] = useState(null);
 
   // Debounce search function
   useEffect(() => {
@@ -57,7 +55,7 @@ function SaleForm({ onSaleAdded }) {
     updatedItems[index] = {
       ...updatedItems[index],
       productId: product.id,
-      product: product
+      product: product,
     };
     setItems(updatedItems);
     setSearchQuery("");
@@ -79,12 +77,24 @@ function SaleForm({ onSaleAdded }) {
           quantity: parseInt(item.quantity, 10),
         })),
       };
+
       const response = await api.post("/sales/add-sale", saleData);
-      
+      const newSale = response.data.data;
+
       if (generatePDF) {
-        setSaleData(response.data.data);
+        const blob = await pdf(<InvoiceTemplate sale={newSale} />).toBlob();
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `invoice_${newSale.id}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        toast.success("Invoice downloaded successfully!");
       }
-      
+
       onSaleAdded();
       setPaymentType("");
       setCustomerName("");
@@ -92,7 +102,6 @@ function SaleForm({ onSaleAdded }) {
       setCustomerPhone("");
       setItems([{ productId: "", product: null, quantity: 1 }]);
       setGeneratePDF(false);
-      toast.success("Sale completed successfully");
     } catch (error) {
       toast.error("Failed to complete sale");
       console.error(error);
@@ -130,7 +139,7 @@ function SaleForm({ onSaleAdded }) {
     updatedItems[index] = {
       ...updatedItems[index],
       productId: "",
-      product: null
+      product: null,
     };
     setItems(updatedItems);
     setSearchQuery("");
@@ -141,7 +150,9 @@ function SaleForm({ onSaleAdded }) {
       <form onSubmit={handleSubmit} className="space-y-6 p-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-[#1C3333]">Customer Name</label>
+            <label className="block text-sm font-medium text-[#1C3333]">
+              Customer Name
+            </label>
             <input
               value={customerName}
               onChange={(e) => setCustomerName(e.target.value)}
@@ -151,7 +162,9 @@ function SaleForm({ onSaleAdded }) {
           </div>
 
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-[#1C3333]">Customer Email</label>
+            <label className="block text-sm font-medium text-[#1C3333]">
+              Customer Email
+            </label>
             <input
               type="email"
               value={customerEmail}
@@ -162,7 +175,9 @@ function SaleForm({ onSaleAdded }) {
           </div>
 
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-[#1C3333]">Customer Phone</label>
+            <label className="block text-sm font-medium text-[#1C3333]">
+              Customer Phone
+            </label>
             <input
               value={customerPhone}
               onChange={(e) => setCustomerPhone(e.target.value)}
@@ -172,7 +187,9 @@ function SaleForm({ onSaleAdded }) {
           </div>
 
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-[#1C3333]">Payment Type</label>
+            <label className="block text-sm font-medium text-[#1C3333]">
+              Payment Type
+            </label>
             <div className="relative">
               <select
                 value={paymentType}
@@ -214,14 +231,20 @@ function SaleForm({ onSaleAdded }) {
             {items.map((item, index) => (
               <div key={index} className="flex gap-3 items-end">
                 <div className="flex-1 relative">
-                  <label className="block text-sm font-medium text-[#1C3333]">Product</label>
+                  <label className="block text-sm font-medium text-[#1C3333]">
+                    Product
+                  </label>
 
                   {item.product ? (
                     <div className="relative">
                       <div className="w-full px-3 py-2 border border-[#1C3333]/30 rounded-md shadow-sm bg-[#F4F9F9]">
                         <div className="flex justify-between items-center">
-                          <span className="text-[#1C3333] ">{item.product.name}</span>
-                          <span className="text-[#1C3333]/70 mr-4">${item.product.price.toFixed(2)}</span>
+                          <span className="text-[#1C3333] ">
+                            {item.product.name}
+                          </span>
+                          <span className="text-[#1C3333]/70 mr-4">
+                            ${item.product.price.toFixed(2)}
+                          </span>
                         </div>
                       </div>
                       <button
@@ -248,35 +271,44 @@ function SaleForm({ onSaleAdded }) {
                         />
                       </div>
 
-                      {activeSearchIndex === index && (searchQuery || searchResults.length > 0) && (
-                        <div className="absolute z-10 mt-1 w-full bg-white shadow-lg rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto max-h-60 focus:outline-none sm:text-sm">
-                          {searchLoading ? (
-                            <div className="px-4 py-2 text-[#1C3333]/70 flex items-center">
-                              <Loader className="animate-spin mr-2 h-4 w-4" />
-                              Searching...
-                            </div>
-                          ) : searchResults.length === 0 ? (
-                            <div className="px-4 py-2 text-[#1C3333]/70">No products found</div>
-                          ) : (
-                            searchResults.map((product) => (
-                              <div
-                                key={product.id}
-                                className="cursor-pointer hover:bg-[#F4F9F9] px-4 py-2 flex justify-between text-[#1C3333]"
-                                onClick={() => handleProductSelect(product, index)}
-                              >
-                                <span>{product.name}</span>
-                                <span className="text-[#1C3333]/70">${product.price.toFixed(2)}</span>
+                      {activeSearchIndex === index &&
+                        (searchQuery || searchResults.length > 0) && (
+                          <div className="absolute z-10 mt-1 w-full bg-white shadow-lg rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto max-h-60 focus:outline-none sm:text-sm">
+                            {searchLoading ? (
+                              <div className="px-4 py-2 text-[#1C3333]/70 flex items-center">
+                                <Loader className="animate-spin mr-2 h-4 w-4" />
+                                Searching...
                               </div>
-                            ))
-                          )}
-                        </div>
-                      )}
+                            ) : searchResults.length === 0 ? (
+                              <div className="px-4 py-2 text-[#1C3333]/70">
+                                No products found
+                              </div>
+                            ) : (
+                              searchResults.map((product) => (
+                                <div
+                                  key={product.id}
+                                  className="cursor-pointer hover:bg-[#F4F9F9] px-4 py-2 flex justify-between text-[#1C3333]"
+                                  onClick={() =>
+                                    handleProductSelect(product, index)
+                                  }
+                                >
+                                  <span>{product.name}</span>
+                                  <span className="text-[#1C3333]/70">
+                                    ${product.price.toFixed(2)}
+                                  </span>
+                                </div>
+                              ))
+                            )}
+                          </div>
+                        )}
                     </div>
                   )}
                 </div>
 
                 <div className="w-24">
-                  <label className="block text-sm font-medium text-[#1C3333]">Quantity</label>
+                  <label className="block text-sm font-medium text-[#1C3333]">
+                    Quantity
+                  </label>
                   <input
                     placeholder="Qty"
                     type="number"
@@ -310,7 +342,10 @@ function SaleForm({ onSaleAdded }) {
             onChange={(e) => setGeneratePDF(e.target.checked)}
             className="h-4 w-4 text-[#1C3333] focus:ring-[#1C3333] border-[#1C3333]/30 rounded"
           />
-          <label htmlFor="generatePDF" className="ml-2 block text-sm text-[#1C3333]">
+          <label
+            htmlFor="generatePDF"
+            className="ml-2 block text-sm text-[#1C3333]"
+          >
             Generate PDF invoice
           </label>
         </div>
@@ -330,30 +365,6 @@ function SaleForm({ onSaleAdded }) {
           )}
         </button>
       </form>
-
-      {saleData && (
-        <div className="mt-4 px-4">
-          <PDFDownloadLink
-            document={<InvoiceTemplate sale={saleData} />}
-            fileName={`invoice_${saleData.id}.pdf`}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-[#1C3333] hover:bg-[#1C3333]/90"
-          >
-            {({ loading }) => (
-              loading ? (
-                <span className="flex items-center">
-                  <Loader className="animate-spin mr-2 h-4 w-4" />
-                  Preparing document...
-                </span>
-              ) : (
-                <span className="flex items-center">
-                  <Download className="mr-2 h-4 w-4" />
-                  Download Invoice
-                </span>
-              )
-            )}
-          </PDFDownloadLink>
-        </div>
-      )}
     </div>
   );
 }

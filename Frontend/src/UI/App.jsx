@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import Sidebar from "../components/SideBar";
@@ -11,14 +11,17 @@ import ProtectedRoute from "../components/ProtectedRoute";
 import Login from "../pages/Login";
 import ForgetPassword from "../pages/ForgetPassword";
 import ResetPassword from "../pages/ResetPassword";
+import NewSale from "../pages/NewSale";
+import { UserContext } from "../context/UserContext";
 
 function App() {
+  const { user } = useContext(UserContext);
   return (
     <>
       <Toaster position="top-right" reverseOrder={false} />
       <Routes>
         {/* Public route */}
-        <Route path="/" element={<Login />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/forget-password" element={<ForgetPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
 
@@ -31,7 +34,11 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route index element={<Dashboard />} />
+          <Route
+            index
+            element={user?.role === "admin" ? <Dashboard /> : <NewSale />}
+          />
+          <Route path="new-sale" element={<NewSale />} />
           <Route path="product" element={<Product />} />
           <Route path="category" element={<Category />} />
           <Route path="member" element={<Member />} />

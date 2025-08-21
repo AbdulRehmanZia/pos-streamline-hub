@@ -11,6 +11,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { useContext, useState } from "react";
 import { UserContext } from "../context/UserContext";
+import { ShoppingCartIcon } from "lucide-react";
 
 export default function SideBar() {
   const { user, logout } = useContext(UserContext);
@@ -24,9 +25,15 @@ export default function SideBar() {
     {
       name: "Dashboard",
       path: "/dashboard",
-      roles: ["admin", "cashier"],
+      roles: ["admin"],
       icon: <ChartBarIcon className="h-6 w-6" />,
     },
+    {
+    name: "New Sale",
+    path: "/dashboard/new-sale",
+    roles: ["admin", "cashier"], 
+    icon: <ShoppingCartIcon className="h-6 w-6" />,
+  },
     {
       name: "Sales",
       path: "/dashboard/sale",

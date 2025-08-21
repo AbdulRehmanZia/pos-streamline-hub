@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from "react";
-import loader from "../../dist/loader.svg";
+// import loader from "../../dist/loader.svg";
 import { UserContext } from "../context/UserContext";
 import {
   ShoppingCart,
@@ -51,7 +51,7 @@ export default function Dashboard() {
 
         {/* 🔹 Loader Centered */}
         <div className="flex justify-center items-center h-[70vh]">
-          <img src={loader} alt="Loading..." className="h-20" />
+          {/* <img src={loader} alt="Loading..." className="h-20" /> */}
         </div>
       </div>
     );
