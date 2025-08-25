@@ -10,13 +10,16 @@ export const AllAnalyst = async (req, res) => {
 
     const totalProducts = await prisma.product.count();
 
-    const totalSaleItems = await prisma.saleItem.count();
+    const totalSaleItems = await prisma.saleItem.count()
 
     const totalSalesAmount = await prisma.sale.aggregate({
       _sum: { totalAmount: true },
     });
 
     const categoryWiseProductCount = await prisma.category.findMany({
+      where:{
+        isDeleted:false
+      },
       select: {
         id: true,
         name: true,
@@ -48,8 +51,7 @@ export const RecentActivity = async (req, res) => {
     // const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000);
     // const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
-
-    const [users, sales, categories] = await  Promise.all([
+    const [users, sales, categories] = await Promise.all([
       //  User Recent Activity
       prisma.user.findMany({
         where: {
@@ -62,7 +64,7 @@ export const RecentActivity = async (req, res) => {
           fullname: true,
           email: true,
           role: true,
-          createdAt:true
+          createdAt: true,
         },
       }),
 
@@ -78,8 +80,8 @@ export const RecentActivity = async (req, res) => {
           saleItems: {
             select: {
               quantity: true,
-               product: {
-                 select: {
+              product: {
+                select: {
                   name: true,
                   price: true,
                   stockQuantity: true,
@@ -88,23 +90,23 @@ export const RecentActivity = async (req, res) => {
             },
           },
         },
-        orderBy:{
-          createdAt:'desc'
-        }
+        orderBy: {
+          createdAt: "desc",
+        },
       }),
 
       // Categor Recent Activity
       prisma.category.findMany({
         where: {
+          isDeleted: false, // works only if Boolean field hai
           OR: [
             { createdAt: { gte: fifteenMinuteAgo } },
-            { updatedAt: { gte: fifteenMinuteAgo } },
+            { updatedAt: { gte: fifteenMinuteAgo  } },
           ],
         },
-        include: { products:true
-          // {select:{name:true}}
-         }
-          ,
+        include: {
+          products: true,
+        },
       }),
     ]);
 
