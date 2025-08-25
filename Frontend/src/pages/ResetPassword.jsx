@@ -110,7 +110,7 @@ const ResetPassword = () => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  className="absolute cursor-pointer inset-y-0 right-0 pr-3 flex items-center"
                 >
                   {showPassword ? (
                     <EyeOff className="h-5 w-5 text-[#1C3333]/60 hover:text-[#1C3333]" />
@@ -142,7 +142,7 @@ const ResetPassword = () => {
                 type="button"
                 whileTap={{ scale: 0.98 }}
                 onClick={() => navigate('/forget-password')}
-                className="flex-1 py-3 px-4 border border-[#1C3333]/30 text-[#1C3333] font-medium rounded-md hover:bg-[#1C3333]/10 transition-colors"
+                className="flex-1 py-3 cursor-pointer px-4 border border-[#1C3333]/30 text-[#1C3333] font-medium rounded-md hover:bg-[#1C3333]/10 transition-colors"
               >
                 Back
               </motion.button>
@@ -151,7 +151,7 @@ const ResetPassword = () => {
                 type="submit"
                 whileTap={{ scale: 0.98 }}
                 disabled={loading}
-                className={`flex-1 py-3 px-4 rounded-md font-medium text-white transition-colors ${
+                className={`flex-1 py-3 cursor-pointer px-4 rounded-md font-medium text-white transition-colors ${
                   loading
                     ? "bg-[#1C3333]/80 cursor-not-allowed"
                     : "bg-[#1C3333] hover:bg-[#1C3333]/90 shadow-sm"

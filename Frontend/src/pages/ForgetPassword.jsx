@@ -72,7 +72,7 @@ const ForgetPassword = () => {
               type="submit"
               whileTap={{ scale: 0.98 }}
               disabled={loading}
-              className={`w-full py-3 px-4 rounded-md font-medium text-white transition-colors ${
+              className={`w-full py-3 cursor-pointer px-4 rounded-md font-medium text-white transition-colors ${
                 loading
                   ? "bg-[#1C3333]/80 cursor-not-allowed"
                   : "bg-[#1C3333] hover:bg-[#1C3333]/90 shadow-sm"
@@ -91,7 +91,7 @@ const ForgetPassword = () => {
             <div className="text-center mt-4">
               <Link
                 to="/login"
-                className="text-[#1C3333] hover:text-[#1C3333]/70 font-medium flex items-center justify-center"
+                className="text-[#1C3333] cursor-pointer hover:text-[#1C3333]/70 font-medium flex items-center justify-center"
               >
                 <ArrowLeft className="h-4 w-4 mr-1" /> Back to login
               </Link>

@@ -90,7 +90,7 @@ export default function SideBar() {
           )}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="p-2 rounded-md hover:bg-[#F4F9F9]/20"
+            className="p-2 rounded-md cursor-pointer hover:bg-[#F4F9F9]/20"
           >
             {isOpen ? (
               <XMarkIcon className="h-6 w-6 text-[#F4F9F9]" />
@@ -138,7 +138,7 @@ export default function SideBar() {
         <div className="border-t border-[#F4F9F9]/20 p-4">
           <button
             onClick={handleLogout}
-            className="flex items-center gap-3 px-4 py-3  w-full text-sm font-medium text-red-500 hover:bg-red-600/20 transition-colors cursor-pointer"
+            className="flex items-center gap-3 rounded-lg px-4 py-3  w-full text-sm font-medium text-red-500 hover:bg-red-600/20 transition-colors cursor-pointer"
           >
             <BiLogOut className="h-6 w-6" />
             {isOpen && <span>Logout</span>}
