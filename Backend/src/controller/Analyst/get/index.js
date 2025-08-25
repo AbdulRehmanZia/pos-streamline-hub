@@ -44,21 +44,25 @@ export const AllAnalyst = async (req, res) => {
 
 export const RecentActivity = async (req, res) => {
   try {
-    const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000);
+    const fifteenMinuteAgo = new Date(Date.now() - 15 * 60 * 1000);
+    // const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000);
+    // const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
-    const [users, sales, categories] = await Promise.all([
+
+    const [users, sales, categories] = await  Promise.all([
       //  User Recent Activity
       prisma.user.findMany({
         where: {
           OR: [
-            { createdAt: { gte: fifteenMinutesAgo } },
-            { updatedAt: { gte: fifteenMinutesAgo } },
+            { createdAt: { gte: fifteenMinuteAgo } },
+            { updatedAt: { gte: fifteenMinuteAgo } },
           ],
         },
         select: {
           fullname: true,
           email: true,
           role: true,
+          createdAt:true
         },
       }),
 
@@ -66,8 +70,8 @@ export const RecentActivity = async (req, res) => {
       prisma.sale.findMany({
         where: {
           OR: [
-            { createdAt: { gte: fifteenMinutesAgo } },
-            { updatedAt: { gte: fifteenMinutesAgo } },
+            { createdAt: { gte: fifteenMinuteAgo } },
+            { updatedAt: { gte: fifteenMinuteAgo } },
           ],
         },
         include: {
@@ -93,8 +97,8 @@ export const RecentActivity = async (req, res) => {
       prisma.category.findMany({
         where: {
           OR: [
-            { createdAt: { gte: fifteenMinutesAgo } },
-            { updatedAt: { gte: fifteenMinutesAgo } },
+            { createdAt: { gte: fifteenMinuteAgo } },
+            { updatedAt: { gte: fifteenMinuteAgo } },
           ],
         },
         include: { products:true
