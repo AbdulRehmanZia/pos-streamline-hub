@@ -30,7 +30,7 @@ export default function Category() {
               <Tag className="h-6 w-6" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-[#2F4F4F]">Categories Management</h1>
+              <h1 className="text-2xl font-bold text-[#2F4F4F]">Categories</h1>
               <p className="text-[#2F4F4F]/80">Organize your products into categories</p>
             </div>
           </div>
@@ -38,7 +38,7 @@ export default function Category() {
           {user?.role === "admin" && (
             <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
               <SheetTrigger asChild>
-                <button className="inline-flex items-center px-4 py-2.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-[#2F4F4F] hover:bg-[#2F4F4F]/90 transition-colors">
+                <button className="inline-flex items-center cursor-pointer px-4 py-2.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-[#2F4F4F] hover:bg-[#2F4F4F]/90 transition-colors">
                   <PlusCircle className="mr-2 h-5 w-5" />
                   New Category
                 </button>
@@ -62,15 +62,9 @@ export default function Category() {
             </Sheet>
           )}
         </div>
-
-        <div className="bg-white rounded-lg border border-[#2F4F4F]/20 shadow-sm overflow-hidden">
-          <div className="p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold text-[#2F4F4F]">All Categories</h2>
-            </div>
+          
+            
             <CategoryTable refreshKey={refreshKey} />
-          </div>
-        </div>
       </div>
     </div>
   );

@@ -37,6 +37,7 @@ const Login = () => {
       localStorage.setItem("accessToken", accessToken);
       toast.success("Login successful!");
       navigate("/dashboard");
+
     } catch (error) {
       console.error("Login error details:", error);
       const errMsg = error.response?.data?.message || "Login failed. Please try again.";
@@ -103,7 +104,7 @@ const Login = () => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  className="absolute cursor-pointer inset-y-0 right-0 pr-3 flex items-center"
                 >
                   {showPassword ? (
                     <EyeOff className="h-5 w-5 text-[#1C3333]/60 hover:text-[#1C3333]" />
@@ -117,8 +118,8 @@ const Login = () => {
             <div className="flex items-center justify-between">
               <button
                 type="button"
-                onClick={() => navigate("/forgetpassword")}
-                className="text-sm text-[#1C3333] hover:text-[#1C3333]/70 hover:underline focus:outline-none"
+                onClick={() => navigate("/forget-password")}
+                className="text-sm text-[#1C3333] cursor-pointer hover:text-[#1C3333]/70 hover:underline focus:outline-none"
               >
                 Forgot password?
               </button>
@@ -128,7 +129,7 @@ const Login = () => {
               type="submit"
               whileTap={{ scale: 0.98 }}
               disabled={isLoading}
-              className={`w-full py-3 px-4 rounded-md font-medium text-white transition-colors ${
+              className={`w-full py-3 px-4 cursor-pointer rounded-md font-medium text-white transition-colors ${
                 isLoading
                   ? "bg-[#1C3333]/80 cursor-not-allowed"
                   : "bg-[#1C3333] hover:bg-[#1C3333]/90 shadow-sm"

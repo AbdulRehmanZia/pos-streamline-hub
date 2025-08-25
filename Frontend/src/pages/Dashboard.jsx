@@ -1,7 +1,11 @@
 import React, { useContext, useState, useEffect } from "react";
+<<<<<<< HEAD
 import { Users, Package, ShoppingCart, CreditCard } from "lucide-react";
 import moment from "moment";
 import loader from "../img/loader.svg";
+=======
+// import loader from "../../dist/loader.svg";
+>>>>>>> 1a9ed6891cf767db71706984d146c3e6e7d6a1bf
 import { UserContext } from "../context/UserContext";
 import { api } from "../Instance/api";
 
@@ -58,7 +62,11 @@ export default function Dashboard() {
           Welcome , {user.fullname}
         </h1>
         <div className="flex justify-center items-center h-[70vh]">
+<<<<<<< HEAD
           <img src={loader} className="h-20 " />
+=======
+          {/* <img src={loader} alt="Loading..." className="h-20" /> */}
+>>>>>>> 1a9ed6891cf767db71706984d146c3e6e7d6a1bf
         </div>
       </div>
     );

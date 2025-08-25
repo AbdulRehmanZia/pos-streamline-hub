@@ -73,7 +73,7 @@ export default function ProductForm({ onProductAdded, initialData, onClose }) {
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Enter product name"
-          className="w-full px-3 py-2 border border-[#1C3333]/30 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1C3333] focus:border-[#1C3333] text-[#1C3333] bg-white"
+          className="w-full px-3 py-2 border border-[#1C3333]/30 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1C3333] focus:border-[#1C3333] text-[#1C3333] bg-white cursor-pointer"
           required
         />
       </div>
@@ -88,7 +88,7 @@ export default function ProductForm({ onProductAdded, initialData, onClose }) {
             value={price}
             onChange={(e) => setPrice(e.target.value)}
             placeholder="Enter price"
-            className="w-full px-3 py-2 border border-[#1C3333]/30 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1C3333] focus:border-[#1C3333] text-[#1C3333] bg-white"
+            className="w-full px-3 py-2 border border-[#1C3333]/30 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1C3333] focus:border-[#1C3333] text-[#1C3333] bg-white cursor-pointer"
             min="0"
             step="0.01"
             required
@@ -104,7 +104,7 @@ export default function ProductForm({ onProductAdded, initialData, onClose }) {
             value={costPrice}
             onChange={(e) => setCostPrice(e.target.value)}
             placeholder="Enter cost price"
-            className="w-full px-3 py-2 border border-[#1C3333]/30 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1C3333] focus:border-[#1C3333] text-[#1C3333] bg-white"
+            className="w-full px-3 py-2 border border-[#1C3333]/30 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1C3333] focus:border-[#1C3333] text-[#1C3333] bg-white cursor-pointer"
             min="0"
             step="0.01"
             required
@@ -122,38 +122,37 @@ export default function ProductForm({ onProductAdded, initialData, onClose }) {
             value={stockQuantity}
             onChange={(e) => setStockQuantity(e.target.value)}
             placeholder="Enter stock quantity"
-            className="w-full px-3 py-2 border border-[#1C3333]/30 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1C3333] focus:border-[#1C3333] text-[#1C3333] bg-white"
+            className="w-full px-3 py-2 border border-[#1C3333]/30 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1C3333] focus:border-[#1C3333] text-[#1C3333] bg-white cursor-pointer"
             min="0"
             required
           />
         </div>
 
-       <div className="space-y-2">
-  <label className="block text-sm font-medium text-[#1C3333]">
-    Unit
-  </label>
-  <select
-    value={unit}
-    onChange={(e) => setUnit(e.target.value)}
-    className="w-full px-3 py-2 border border-[#1C3333]/30 rounded-md shadow-sm 
-               focus:outline-none focus:ring-2 focus:ring-[#1C3333] 
-               focus:border-[#1C3333] text-[#1C3333] bg-white"
-    required
-  >
-    <option value="">Select unit</option>
-    <option value="piece">Piece</option>
-    <option value="kg">Kilogram (kg)</option>
-    <option value="g">Gram (g)</option>
-    <option value="lb">Pound (lb)</option>
-    <option value="oz">Ounce (oz)</option>
-    <option value="ltr">Liter (ltr)</option>
-    <option value="ml">Milliliter (ml)</option>
-    <option value="pack">Pack</option>
-    <option value="box">Box</option>
-    <option value="dozen">Dozen</option>
-  </select>
-</div>
-
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-[#1C3333]">
+            Unit
+          </label>
+          <select
+            value={unit}
+            onChange={(e) => setUnit(e.target.value)}
+            className="w-full px-3 py-2 border border-[#1C3333]/30 rounded-md shadow-sm 
+                       focus:outline-none focus:ring-2 focus:ring-[#1C3333] 
+                       focus:border-[#1C3333] text-[#1C3333] bg-white cursor-pointer"
+            required
+          >
+            <option value="">Select unit</option>
+            <option value="piece">Piece</option>
+            <option value="kg">Kilogram (kg)</option>
+            <option value="g">Gram (g)</option>
+            <option value="lb">Pound (lb)</option>
+            <option value="oz">Ounce (oz)</option>
+            <option value="ltr">Liter (ltr)</option>
+            <option value="ml">Milliliter (ml)</option>
+            <option value="pack">Pack</option>
+            <option value="box">Box</option>
+            <option value="dozen">Dozen</option>
+          </select>
+        </div>
       </div>
 
       <div className="space-y-2">
@@ -163,7 +162,7 @@ export default function ProductForm({ onProductAdded, initialData, onClose }) {
         <select
           value={categoryId}
           onChange={(e) => setCategoryId(e.target.value)}
-          className="w-full px-3 py-2 border border-[#1C3333]/30 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1C3333] focus:border-[#1C3333] text-[#1C3333] bg-white"
+          className="w-full px-3 py-2 border border-[#1C3333]/30 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1C3333] focus:border-[#1C3333] text-[#1C3333] bg-white cursor-pointer"
           required
         >
           <option value="">Select a category</option>
@@ -180,7 +179,7 @@ export default function ProductForm({ onProductAdded, initialData, onClose }) {
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 border border-[#1C3333]/30 rounded-md shadow-sm text-sm font-medium text-[#1C3333] bg-white hover:bg-[#F4F9F9]"
+            className="px-4 py-2 border border-[#1C3333]/30 rounded-md shadow-sm text-sm font-medium text-[#1C3333] bg-white hover:bg-[#F4F9F9] cursor-pointer"
           >
             Cancel
           </button>
@@ -188,7 +187,7 @@ export default function ProductForm({ onProductAdded, initialData, onClose }) {
         <button
           type="submit"
           disabled={loading}
-          className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#1C3333] hover:bg-[#1C3333]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1C3333] disabled:opacity-70"
+          className="px-4 py-2 cursor-pointer border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#1C3333] hover:bg-[#1C3333]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1C3333] disabled:opacity-70 disabled:cursor-not-allowed"
         >
           {loading ? (
             <>
@@ -204,4 +203,4 @@ export default function ProductForm({ onProductAdded, initialData, onClose }) {
       </div>
     </form>
   );
-} 
+}
