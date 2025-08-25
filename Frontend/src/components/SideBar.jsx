@@ -41,19 +41,19 @@ export default function SideBar() {
       icon: <RectangleStackIcon className="h-6 w-6" />,
     },
     {
-      name: "Product",
+      name: "Products",
       path: "/dashboard/product",
       roles: ["admin", "cashier"],
       icon: <ShoppingBagIcon className="h-6 w-6" />,
     },
     {
-      name: "Category",
+      name: "Categories",
       roles: ["admin", "cashier"],
       path: "/dashboard/category",
       icon: <TagIcon className="h-6 w-6" />,
     },
     {
-      name: "Member",
+      name: "Members",
       path: "/dashboard/member",
       roles: ["admin"],
       icon: <RiTeamLine className="h-6 w-6" />,
@@ -74,7 +74,7 @@ export default function SideBar() {
         ${isOpen ? "w-72" : "w-24"}`}
       >
         {/* Sidebar Header */}
-        <div className="flex items-center justify-between px-4 py-4 border-b border-[#F4F9F9]/20">
+        <div className="flex items-center justify-between px-4 py-4 border border-[#F4F9F9]/20">
           {isOpen && (
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-full bg-[#F4F9F9] text-[#1C3333] flex items-center justify-center font-bold">
@@ -111,7 +111,7 @@ export default function SideBar() {
           </p>
 
           {navItems
-  .filter(item => item.roles.includes(user?.role)) // ✅ only show items the role is allowed to see
+  .filter(item => item.roles.includes(user?.role)) 
   .map((item) => {
     const isActive = location.pathname === item.path;
     return (
@@ -122,7 +122,7 @@ export default function SideBar() {
         className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200
           ${
             isActive
-              ? "bg-[#F4F9F9] text-[#1C3333] shadow-md border-l-4 border-[#FFB703]"
+              ? "bg-[#F4F9F9] text-[#1C3333] shadow-md border-l-4"
               : "text-[#F4F9F9] hover:bg-[#F4F9F9]/20"
           }`}
       >
@@ -138,7 +138,7 @@ export default function SideBar() {
         <div className="border-t border-[#F4F9F9]/20 p-4">
           <button
             onClick={handleLogout}
-            className="flex items-center gap-3 px-4 py-3 rounded-lg w-full text-sm font-medium text-red-500 hover:bg-red-600/20 transition-colors"
+            className="flex items-center gap-3 px-4 py-3  w-full text-sm font-medium text-red-500 hover:bg-red-600/20 transition-colors cursor-pointer"
           >
             <BiLogOut className="h-6 w-6" />
             {isOpen && <span>Logout</span>}

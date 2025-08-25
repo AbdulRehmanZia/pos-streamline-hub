@@ -69,6 +69,8 @@ export default function CategoryTable({ refreshKey }) {
       }
       setDeleteModalOpen(false);
       setCategoryToDelete(null);
+      // Force refresh after delete
+      setTimeout(() => fetchCategories(), 100);
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to delete category");
       console.error("Error deleting category", error);
@@ -93,6 +95,13 @@ export default function CategoryTable({ refreshKey }) {
     setIsEditSheetOpen(true);
   };
 
+  const handleCategoryUpdated = () => {
+    setPagination(prev => ({ ...prev, page: 1 }));
+    fetchCategories();
+    setIsEditSheetOpen(false);
+    setSelectedCategory(null);
+  };
+
   useEffect(() => {
     fetchCategories();
   }, [refreshKey, pagination.page, pagination.limit]);
@@ -112,7 +121,7 @@ export default function CategoryTable({ refreshKey }) {
         <p className="text-lg font-medium">{error}</p>
         <button
           onClick={fetchCategories}
-          className="mt-4 px-4 py-2 bg-[#1C3333] text-white rounded-md hover:bg-[#1C3333]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1C3333]"
+          className="mt-4 px-4 cursor-pointer py-2 bg-[#1C3333] text-white rounded-md hover:bg-[#1C3333]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1C3333]"
         >
           Retry
         </button>
@@ -131,16 +140,16 @@ export default function CategoryTable({ refreshKey }) {
           </SheetHeader>
           <CategoryForm
             initialData={selectedCategory}
-            onCategoryAdded={() => {
-              setPagination(prev => ({ ...prev, page: 1 }));
-              fetchCategories();
+            onCategoryAdded={handleCategoryUpdated}
+            onClose={() => {
               setIsEditSheetOpen(false);
+              setSelectedCategory(null);
             }}
-            onClose={() => setIsEditSheetOpen(false)}
           />
         </SheetContent>
       </Sheet>
 
+      {/* Top pagination info and controls */}
       <div className="px-4 py-3 flex items-center justify-between border-b border-[#1C3333]/20 bg-[#F4F9F9]">
         <div className="flex items-center space-x-2">
           <span className="text-sm text-[#1C3333]">
@@ -153,29 +162,13 @@ export default function CategoryTable({ refreshKey }) {
           <select
             value={pagination.limit}
             onChange={handleLimitChange}
-            className="text-sm border-[#1C3333]/30 rounded-md focus:ring-[#1C3333] focus:border-[#1C3333] text-[#1C3333]"
+            className="text-sm cursor-pointer border-[#1C3333]/30 rounded-md focus:ring-[#1C3333] focus:border-[#1C3333] text-[#1C3333]"
           >
             <option value="5">5 per page</option>
             <option value="10">10 per page</option>
             <option value="20">20 per page</option>
             <option value="50">50 per page</option>
           </select>
-        </div>
-        <div className="flex space-x-2">
-          <button
-            onClick={() => handlePageChange(pagination.page - 1)}
-            disabled={pagination.page === 1}
-            className="px-3 py-1 border border-[#1C3333]/30 rounded-md text-sm font-medium text-[#1C3333] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#1C3333]/10"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => handlePageChange(pagination.page + 1)}
-            disabled={pagination.page === pagination.totalPages}
-            className="px-3 py-1 border border-[#1C3333]/30 rounded-md text-sm font-medium text-[#1C3333] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#1C3333]/10"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </button>
         </div>
       </div>
 
@@ -200,7 +193,7 @@ export default function CategoryTable({ refreshKey }) {
             {categories.map((category) => (
               <tr key={category.id} className="hover:bg-[#F4F9F9]">
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-[#1C3333]">{category.name}</div>
+                  <div className="text-sm font-medium text-[#1C3333] capitalize">{category.name}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap ">
                   <div className="text-sm text-[#1C3333]/80 text-center">{category._count?.products || 0}</div>
@@ -210,13 +203,13 @@ export default function CategoryTable({ refreshKey }) {
                     <div className="flex justify-end space-x-2">
                       <button
                         onClick={() => handleEditClick(category)}
-                        className="text-[#1C3333] hover:text-[#1C3333]/70 p-1 rounded-md hover:bg-[#1C3333]/10"
+                        className="text-[#1C3333] cursor-pointer hover:text-[#1C3333]/70 p-1 rounded-md hover:bg-[#1C3333]/10"
                       >
                         <Edit className="h-5 w-5" />
                       </button>
                       <button
                         onClick={() => handleDeleteClick(category.id)}
-                        className="text-[#FF6F61] hover:text-[#FF6F61]/80 p-1 rounded-md hover:bg-[#FF6F61]/10"
+                        className="text-[#FF6F61] cursor-pointer hover:text-[#FF6F61]/80 p-1 rounded-md hover:bg-[#FF6F61]/10"
                       >
                         <Trash2 className="h-5 w-5" />
                       </button>
@@ -240,7 +233,6 @@ export default function CategoryTable({ refreshKey }) {
             >
               <path
                 strokeLinecap="round"
-                
                 strokeLinejoin="round"
                 strokeWidth={2}
                 d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
@@ -251,6 +243,27 @@ export default function CategoryTable({ refreshKey }) {
           <p className="text-[#1C3333]/70 text-sm">Create your first category</p>
         </div>
       )}
+
+      {/* Bottom pagination navigation */}
+      <div className="px-4 py-3 flex justify-center space-x-2 border-t border-[#1C3333]/20 bg-[#F4F9F9]">
+        <button
+          onClick={() => handlePageChange(pagination.page - 1)}
+          disabled={pagination.page === 1}
+          className="px-3 py-1 border cursor-pointer border-[#1C3333]/30 rounded-md text-sm font-medium text-[#1C3333] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#1C3333]/10"
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </button>
+        <span className="px-3 py-1 text-sm text-[#1C3333] flex items-center">
+          Page {pagination.page} of {pagination.totalPages}
+        </span>
+        <button
+          onClick={() => handlePageChange(pagination.page + 1)}
+          disabled={pagination.page === pagination.totalPages}
+          className="px-3 py-1 border cursor-pointer border-[#1C3333]/30 rounded-md text-sm font-medium text-[#1C3333] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#1C3333]/10"
+        >
+          <ChevronRight className="h-4 w-4" />
+        </button>
+      </div>
 
       <ConfirmModal
         open={deleteModalOpen}

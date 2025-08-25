@@ -99,10 +99,10 @@ console.log("Response:", res.data);
         totalItems: prev.totalItems - 1
       }));
       
-      fetchMembers();
-      
       setDeleteModalOpen(false);
       setMemberToDelete(null);
+      // Force refresh after delete
+      setTimeout(() => fetchMembers(), 100);
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to delete member");
       console.error("Error deleting member", error);
@@ -132,6 +132,13 @@ console.log("Response:", res.data);
     setIsEditSheetOpen(true);
   };
 
+  const handleMemberUpdated = () => {
+    setPagination(prev => ({ ...prev, page: 1 }));
+    fetchMembers();
+    setIsEditSheetOpen(false);
+    setSelectedMember(null);
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -147,7 +154,7 @@ console.log("Response:", res.data);
         <p className="text-lg font-medium">{error}</p>
         <button
           onClick={fetchMembers}
-          className="mt-4 px-4 py-2 bg-[#1C3333] text-white rounded-md hover:bg-[#1C3333]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1C3333]"
+          className="mt-4 px-4 cursor-pointer py-2 bg-[#1C3333] text-white rounded-md hover:bg-[#1C3333]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1C3333]"
         >
           Retry
         </button>
@@ -166,16 +173,16 @@ console.log("Response:", res.data);
           </SheetHeader>
           <MemberForm
             initialData={selectedMember}
-            onMemberAdded={() => {
-              setPagination(prev => ({ ...prev, page: 1 }));
-              fetchMembers();
+            onMemberAdded={handleMemberUpdated}
+            onClose={() => {
               setIsEditSheetOpen(false);
+              setSelectedMember(null);
             }}
-            onClose={() => setIsEditSheetOpen(false)}
           />
         </SheetContent>
       </Sheet>
 
+      {/* Top controls with search and pagination info */}
       <div className="px-4 py-3 flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-[#1C3333]/20 bg-[#F4F9F9] gap-3">
         <div className="w-full sm:w-auto">
           <input
@@ -198,29 +205,13 @@ console.log("Response:", res.data);
           <select
             value={pagination.limit}
             onChange={handleLimitChange}
-            className="text-sm border-[#1C3333]/30 rounded-md focus:ring-[#1C3333] focus:border-[#1C3333] text-[#1C3333]"
+            className="text-sm cursor-pointer border-[#1C3333]/30 rounded-md focus:ring-[#1C3333] focus:border-[#1C3333] text-[#1C3333]"
           >
             <option value="5">5 per page</option>
             <option value="10">10 per page</option>
             <option value="20">20 per page</option>
             <option value="50">50 per page</option>
           </select>
-        </div>
-        <div className="flex space-x-2 w-full sm:w-auto justify-end">
-          <button
-            onClick={() => handlePageChange(pagination.page - 1)}
-            disabled={pagination.page === 1}
-            className="px-3 py-1 border border-[#1C3333]/30 rounded-md text-sm font-medium text-[#1C3333] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#1C3333]/10"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => handlePageChange(pagination.page + 1)}
-            disabled={pagination.page === pagination.totalPages}
-            className="px-3 py-1 border border-[#1C3333]/30 rounded-md text-sm font-medium text-[#1C3333] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#1C3333]/10"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </button>
         </div>
       </div>
 
@@ -270,14 +261,14 @@ console.log("Response:", res.data);
                       <div className="flex justify-end space-x-2">
                         <button
                           onClick={() => handleEditClick(member)}
-                          className="text-[#1C3333] hover:text-[#1C3333]/70 p-1 rounded-md hover:bg-[#1C3333]/10"
+                          className="text-[#1C3333] cursor-pointer hover:text-[#1C3333]/70 p-1 rounded-md hover:bg-[#1C3333]/10"
                         >
                           <Edit className="h-5 w-5" />
                         </button>
                         <button
                           onClick={() => handleDeleteClick(member.id)}
                           disabled={member.role === 'admin'} 
-                          className={`p-1 rounded-md hover:bg-[#FF6F61]/10 ${
+                          className={`p-1 rounded-md cursor-pointer hover:bg-[#FF6F61]/10 ${
                             member.role === 'admin' 
                               ? 'text-gray-400 cursor-not-allowed' 
                               : 'text-[#FF6F61] hover:text-[#FF6F61]/80'
@@ -292,13 +283,50 @@ console.log("Response:", res.data);
               ))
             ) : (
               <tr>
-                <td colSpan={user?.role === "admin" ? 4 : 3} className="py-4 text-center text-[#1C3333]/70">
-                  No members found
+                <td colSpan={user?.role === "admin" ? 4 : 3} className="py-10 text-center">
+                  <div className="bg-[#1C3333]/10 w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <svg
+                      className="h-6 w-6 text-[#1C3333]"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"
+                      />
+                    </svg>
+                  </div>
+                  <h3 className="text-base font-medium text-[#1C3333]">No members yet</h3>
+                  <p className="text-[#1C3333]/70 text-sm">Create your first member</p>
                 </td>
               </tr>
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Bottom pagination navigation */}
+      <div className="px-4 py-3 flex justify-center space-x-2 border-t border-[#1C3333]/20 bg-[#F4F9F9]">
+        <button
+          onClick={() => handlePageChange(pagination.page - 1)}
+          disabled={pagination.page === 1}
+          className="px-3 py-1 border cursor-pointer border-[#1C3333]/30 rounded-md text-sm font-medium text-[#1C3333] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#1C3333]/10"
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </button>
+        <span className="px-3 py-1 text-sm text-[#1C3333] flex items-center">
+          Page {pagination.page} of {pagination.totalPages}
+        </span>
+        <button
+          onClick={() => handlePageChange(pagination.page + 1)}
+          disabled={pagination.page === pagination.totalPages}
+          className="px-3 py-1 border cursor-pointer border-[#1C3333]/30 rounded-md text-sm font-medium text-[#1C3333] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#1C3333]/10"
+        >
+          <ChevronRight className="h-4 w-4" />
+        </button>
       </div>
 
       <ConfirmModal

@@ -13,6 +13,7 @@ import ForgetPassword from "../pages/ForgetPassword";
 import ResetPassword from "../pages/ResetPassword";
 import NewSale from "../pages/NewSale";
 import { UserContext } from "../context/UserContext";
+import Camera from "../pages/camera";
 
 function App() {
   const { user } = useContext(UserContext);
@@ -39,6 +40,7 @@ function App() {
             element={user?.role === "admin" ? <Dashboard /> : <NewSale />}
           />
           <Route path="new-sale" element={<NewSale />} />
+          <Route path="camera" element={<Camera/>} />
           <Route path="product" element={<Product />} />
           <Route path="category" element={<Category />} />
           <Route path="member" element={<Member />} />

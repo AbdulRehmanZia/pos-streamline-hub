@@ -133,15 +133,15 @@ const InvoiceTemplate = ({ sale }) => {
           {sale.saleItems.map((item, index) => (
             <View key={index} style={styles.tableRow}>
               <Text style={styles.col1}>{item.product.name}</Text>
-              <Text style={styles.col2}>${item.product.price.toFixed(2)}</Text>
+              <Text style={styles.col2}>Rs.{item.product.price.toFixed(2)}</Text>
               <Text style={styles.col3}>{item.quantity}</Text>
-              <Text style={styles.col4}>${(item.product.price * item.quantity).toFixed(2)}</Text>
+              <Text style={styles.col4}>Rs.{(item.product.price * item.quantity).toFixed(2)}</Text>
             </View>
           ))}
 
           <View style={styles.totalRow}>
             <Text style={styles.totalLabel}>Total Amount:</Text>
-            <Text style={styles.totalValue}>${sale.totalAmount.toFixed(2)}</Text>
+            <Text style={styles.totalValue}>Rs.{sale.totalAmount.toFixed(2)}</Text>
           </View>
         </View>
 
