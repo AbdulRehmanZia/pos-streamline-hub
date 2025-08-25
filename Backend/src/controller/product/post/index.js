@@ -5,7 +5,7 @@ import ApiResponse from "../../../utils/ApiResponse.js";
 //Add Product
 export const addProduct = async (req, res) => {
   try {
-    const { name, price, costPrice, stockQuantity, unit, categoryId } =
+    const { name, price, costPrice, stockQuantity, unit, categoryId, barcode } =
       req.body;
 
     if (
@@ -14,7 +14,8 @@ export const addProduct = async (req, res) => {
       !costPrice ||
       !stockQuantity ||
       !unit ||
-      !categoryId
+      !categoryId 
+      // !barcode
     ) {
       return ApiError(res, 400, null, "Please Fill The Required Fields");
     }
@@ -37,6 +38,7 @@ const existingProduct = await prisma.product.findUnique({
         name,
         price: parseFloat(price),
         costPrice: parseFloat(costPrice),
+        // barcode,
         stockQuantity: parseInt(stockQuantity),
         unit,
         category: {

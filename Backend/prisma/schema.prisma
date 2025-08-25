@@ -8,19 +8,19 @@ datasource db {
 }
 
 model User {
-  id           Int      @id @default(autoincrement())
-  email        String   @unique
-  password     String
-  fullname     String
-  profileImg   String?
-  refreshToken String?
-  resetToken String?
+  id               Int       @id @default(autoincrement())
+  email            String    @unique
+  password         String
+  fullname         String
+  profileImg       String?
+  refreshToken     String?
+  resetToken       String?
   resetTokenExpiry DateTime?
-  role         Role     @default(cashier)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @default(now()) @updatedAt
-  Sale         Sale[]
-  isDeleted    Boolean  @default(false)
+  role             Role      @default(cashier)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @default(now()) @updatedAt
+  Sale             Sale[]
+  isDeleted        Boolean   @default(false)
 }
 
 model Category {
@@ -34,6 +34,7 @@ model Category {
 
 model Product {
   id            Int        @id @default(autoincrement())
+  // barcode       String?    @unique
   name          String     @unique
   price         Float
   costPrice     Float
@@ -63,13 +64,13 @@ model Sale {
 }
 
 model SaleItem {
-  id          Int     @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   saleId      Int
   productId   Int
   quantity    Int
   priceAtSale Float
-  product     Product @relation(fields: [productId], references: [id])
-  sale        Sale    @relation(fields: [saleId], references: [id])
+  product     Product  @relation(fields: [productId], references: [id])
+  sale        Sale     @relation(fields: [saleId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @default(now()) @updatedAt
   isDeleted   Boolean  @default(false)

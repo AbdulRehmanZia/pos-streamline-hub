@@ -18,7 +18,12 @@ export default function Product() {
 
   const handleProductAdded = () => {
     setRefreshKey(prev => prev + 1);
-    setIsSheetOpen(false); 
+    setIsSheetOpen(false);
+  };
+
+  // Add this function to force refresh
+  const forceRefresh = () => {
+    setRefreshKey(prev => prev + 1);
   };
 
   return (
@@ -30,7 +35,7 @@ export default function Product() {
               <Package className="h-6 w-6" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-[#2F4F4F]">Products Management</h1>
+              <h1 className="text-2xl font-bold text-[#2F4F4F]">Products</h1>
               <p className="text-[#2F4F4F]/80">Manage your inventory products</p>
             </div>
           </div>
@@ -38,7 +43,7 @@ export default function Product() {
           {user?.role === "admin" && (
             <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
               <SheetTrigger asChild>
-                <button className="inline-flex items-center px-4 py-2.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-[#2F4F4F] hover:bg-[#2F4F4F]/90 transition-colors">
+                <button className="inline-flex cursor-pointer items-center px-4 py-2.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-[#2F4F4F] hover:bg-[#2F4F4F]/90 transition-colors">
                   <PlusCircle className="mr-2 h-5 w-5" />
                   New Product
                 </button>
@@ -62,15 +67,12 @@ export default function Product() {
             </Sheet>
           )}
         </div>
-
-        <div className="bg-white rounded-lg border border-[#2F4F4F]/20 shadow-sm overflow-hidden">
-          <div className="p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold text-[#2F4F4F]">All Products</h2>
-            </div>
-            <ProductTable refreshKey={refreshKey} />
-          </div>
-        </div>
+        
+        {/* Pass the forceRefresh function */}
+        <ProductTable 
+          refreshKey={refreshKey} 
+          forceRefresh={forceRefresh}
+        />
       </div>
     </div>
   );
