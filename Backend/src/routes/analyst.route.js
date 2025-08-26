@@ -1,5 +1,6 @@
 import express from "express";
-import { AllAnalyst, RecentActivity } from "../controller/Analyst/get/index.js";
+import { AllAnalyst} from "../controller/Analyst/get/index.js";
+import { RecentActivity } from "../controller/Recent Activity/get/index.js";
 import { verifyJWT } from "../middleware/authMiddleware.js";
 
 

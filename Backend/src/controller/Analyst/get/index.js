@@ -1,6 +1,8 @@
 import prisma from "../../../db/db.js";
 import ApiError from "../../../utils/ApiError.js";
 import ApiResponse from "../../../utils/ApiResponse.js";
+import moment from "moment"; 
+
 
 //   All Analyst Query
 
@@ -11,11 +13,9 @@ export const AllAnalyst = async (req, res) => {
     const totalProducts = await prisma.product.count();
 
     const totalSaleItems = await prisma.saleItem.count()
-
-    const totalSalesAmount = await prisma.sale.aggregate({
-      _sum: { totalAmount: true },
-    });
-
+    const totalSalesAmount =await prisma.sale.aggregate({
+      _sum:{totalAmount:true}
+    })
     const categoryWiseProductCount = await prisma.category.findMany({
       where:{
         isDeleted:false
@@ -28,92 +28,37 @@ export const AllAnalyst = async (req, res) => {
         },
       },
     });
+
+  
+    
+    const groupedSales = await prisma.sale.groupBy({
+      by:["createdAt"],
+      _sum:{totalAmount:true},
+      orderBy:{createdAt:"asc"}
+    })
+
+    const dailySales = groupedSales.reduce((acc, item) => {
+  const dateOnly = moment(item.createdAt).format("DD-MM-YYYY");
+  if (!acc[dateOnly]) {
+    acc[dateOnly] = 0;
+  }
+  acc[dateOnly] += item._sum.totalAmount || 0;
+  return acc;
+}, {});
     // Response object
     const Summary = {
       totalMembers,
       totalProducts,
       totalSaleItems,
-      totalSalesAmount: totalSalesAmount._sum.totalAmount || 0,
+      totalSalesAmount:totalSalesAmount._sum.totalAmount || 0,
+      dailySales,
       categoryWiseProductCount,
     };
 
     return ApiResponse(res, 200, Summary, "Summary Fetched Successfully");
   } catch (error) {
+        ApiError(res, 500, error.messege, "Fetching Error");
     console.log(error);
   }
 };
 
-//  All Recent Activities Queries
-
-export const RecentActivity = async (req, res) => {
-  try {
-    const fifteenMinuteAgo = new Date(Date.now() - 15 * 60 * 1000);
-    // const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000);
-    // const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-
-    const [users, sales, categories] = await Promise.all([
-      //  User Recent Activity
-      prisma.user.findMany({
-        where: {
-          OR: [
-            { createdAt: { gte: fifteenMinuteAgo } },
-            { updatedAt: { gte: fifteenMinuteAgo } },
-          ],
-        },
-        select: {
-          fullname: true,
-          email: true,
-          role: true,
-          createdAt: true,
-        },
-      }),
-
-      // Sales Recent Activity
-      prisma.sale.findMany({
-        where: {
-          OR: [
-            { createdAt: { gte: fifteenMinuteAgo } },
-            { updatedAt: { gte: fifteenMinuteAgo } },
-          ],
-        },
-        include: {
-          saleItems: {
-            select: {
-              quantity: true,
-              product: {
-                select: {
-                  name: true,
-                  price: true,
-                  stockQuantity: true,
-                },
-              },
-            },
-          },
-        },
-        orderBy: {
-          createdAt: "desc",
-        },
-      }),
-
-      // Categor Recent Activity
-      prisma.category.findMany({
-        where: {
-          isDeleted: false, // works only if Boolean field hai
-          OR: [
-            { createdAt: { gte: fifteenMinuteAgo } },
-            { updatedAt: { gte: fifteenMinuteAgo  } },
-          ],
-        },
-        include: {
-          products: true,
-        },
-      }),
-    ]);
-
-    const AllActivitie = { users, sales, categories };
-    ApiResponse(res, 200, AllActivitie, "All Activities fetch successfuly");
-  } catch (error) {
-    console.error(error);
-    ApiError(res, 500, error.messege, "Fetching Error");
-  }
-};
