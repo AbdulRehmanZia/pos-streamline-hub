@@ -80,9 +80,10 @@ import ApiResponse from "../../../utils/ApiResponse.js";
 
 export const addSale = async (req, res) => {
   try {
-    const { paymentType, items, customerName, customerEmail, customerPhone } = req.body;
+    const { paymentType, items, customerName, customerEmail, customerPhone } =
+      req.body;
 
-    // 1️⃣ Basic in-memory validation (cheap)
+    //  Basic in-memory validation (cheap)
     if (!paymentType || !Array.isArray(items) || items.length === 0) {
       return ApiError(res, 400, "Invalid Sale Data");
     }
@@ -93,21 +94,21 @@ export const addSale = async (req, res) => {
       }
     }
 
-    const productIds = items.map(i => i.productId);
+    const productIds = items.map((i) => i.productId);
 
     const sale = await prisma.$transaction(async (tx) => {
-      // 2️⃣ Fetch all products in one query
+      // Fetch all products in one query
       const products = await tx.product.findMany({
         where: { id: { in: productIds } },
-        select: { id: true, price: true, stockQuantity: true, name: true }
+        select: { id: true, price: true, stockQuantity: true, name: true },
       });
 
       if (products.length !== productIds.length) {
         throw new Error("Some products are missing or deleted");
       }
 
-      // 3️⃣ Validate stock and prepare data
-      const productMap = new Map(products.map(p => [p.id, p]));
+      //  Validate stock and prepare data
+      const productMap = new Map(products.map((p) => [p.id, p]));
       let totalAmount = 0;
       const saleItemData = [];
 
@@ -124,36 +125,36 @@ export const addSale = async (req, res) => {
         });
       }
 
-      // 4️⃣ Bulk stock update — all in one query
+      //  Bulk stock update — all in one query
       await Promise.all(
-        items.map(item =>
+        items.map((item) =>
           tx.product.updateMany({
             where: {
               id: item.productId,
-              stockQuantity: { gte: item.quantity }
+              stockQuantity: { gte: item.quantity },
             },
             data: {
-              stockQuantity: { decrement: item.quantity }
-            }
+              stockQuantity: { decrement: item.quantity },
+            },
           })
         )
       );
 
-      // 5️⃣ Create sale & items in one go
+      //  Create sale & items in one go
       return await tx.sale.create({
-       data: {
-    paymentType,
-    totalAmount,
-    customerName,
-    customerEmail,
-    customerPhone,
-    saleItems: { create: saleItemData },
-    user: {
-      connect: {
-        id: req.user.id // Assuming you have user info in request
-      }
-    }
-  },
+        data: {
+          paymentType,
+          totalAmount,
+          customerName,
+          customerEmail,
+          customerPhone,
+          saleItems: { create: saleItemData },
+          user: {
+            connect: {
+              id: req.user.id, // Assuming you have user info in request
+            },
+          },
+        },
         include: {
           saleItems: { include: { product: true } },
         },
