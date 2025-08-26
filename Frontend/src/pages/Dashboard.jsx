@@ -15,7 +15,6 @@ import {
   LabelList,
 } from "recharts";
 import { CreditCard, Package, ShoppingCart, Users } from "lucide-react";
-import moment from "moment/moment";
 
 export default function Dashboard() {
   const [analyst, setAnalyst] = useState(null);
