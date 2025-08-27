@@ -486,7 +486,7 @@ export default function ProductTable({ refreshKey, forceRefresh }) {
             {products.map((product) => (
               <tr key={product.id} className="hover:bg-[#F4F9F9]">
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-[#1C3333]">{product.name}</div>
+                  <div className="text-sm font-medium text-[#1C3333] capitalize">{product.name}</div>
                   <div className="text-sm text-[#1C3333]/80">{product.unit}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">

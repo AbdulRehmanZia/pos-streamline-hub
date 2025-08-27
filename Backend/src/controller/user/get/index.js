@@ -14,6 +14,7 @@ console.log("Search query:", req.query.search);
 
   try {
     const whereClause = {
+      isDeleted: false,
       OR: [
         { fullname: { contains: search, mode: "insensitive" } },
         { email: { contains: search, mode: "insensitive" } }
