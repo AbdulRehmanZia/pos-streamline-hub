@@ -27,7 +27,7 @@ const DailySalesChart = ({ data }) => {
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="date" />
           <YAxis />
-          <Tooltip formatter={(value) => `$${value.toLocaleString()}`} />
+          <Tooltip formatter={(value) => `Rs.${value.toLocaleString()}`} />
           <Legend />
           <Line
             type="monotone"

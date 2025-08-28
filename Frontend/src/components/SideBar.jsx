@@ -74,7 +74,7 @@ export default function SideBar() {
         ${isOpen ? "w-72" : "w-24"}`}
       >
         {/* Sidebar Header */}
-        <div className="flex items-center justify-between px-4 py-4 border border-[#F4F9F9]/20">
+        <div className="flex mt-9 items-center justify-between px-4 py-4 border border-[#F4F9F9]/20">
           {isOpen && (
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-full bg-[#F4F9F9] text-[#1C3333] flex items-center justify-center font-bold">
