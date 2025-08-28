@@ -5,53 +5,70 @@ import StatCards from "../components/StateCards";
 import CategoryWiseProducts from "../components/CategoryWiseProducts";
 import DailySalesChart from "../components/DailySalesChart";
 import RecentActivity from "../components/RecentActivity";
+import { ShoppingCart } from "lucide-react";
 
 export default function Dashboard() {
   const [analyst, setAnalyst] = useState(null);
   const [users, setUsers] = useState([]);
   const [category, setCategory] = useState([]);
   const [sales, setSales] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const { user } = useContext(UserContext);
 
   useEffect(() => {
-    api
-      .get("analyst")
-      .then((res) => {
-        setAnalyst(res.data.data);
-      })
-      .catch((err) => console.error("API Error:", err));
-  }, []);
-
-  useEffect(() => {
-    const fetchRecentActivity = async () => {
+    const fetchData = async () => {
       try {
-        const res = await api.get("analyst/recent-activity");
-        const { categories = [], users = [], sales = [] } = res.data.data || {};
+        setLoading(true);
+        const [analystRes, activityRes] = await Promise.all([
+          api.get("analyst"),
+          api.get("analyst/recent-activity")
+        ]);
+        
+        setAnalyst(analystRes.data.data);
+        
+        const { categories = [], users = [], sales = [] } = activityRes.data.data || {};
         setCategory(Array.isArray(categories) ? categories : []);
         setUsers(Array.isArray(users) ? users : []);
         setSales(Array.isArray(sales) ? sales : []);
       } catch (err) {
-        console.error("Error fetching recent activity:", err);
+        console.error("API Error:", err);
+      } finally {
+        setLoading(false);
       }
     };
-    fetchRecentActivity();
+    
+    fetchData();
   }, []);
-
-  if (!analyst) {
-    return (
-      <div className="p-6 flex justify-center items-center h-[70vh]">
-        <h1 className="text-2xl font-bold text-gray-800">
-          Welcome, {user.fullname}
-        </h1>
-      </div>
-    );
-  }
 
   const categoryData = analyst?.categoryWiseProductCount?.map((d) => ({
     name: d.name,
     products: d._count.products,
   }));
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#F4F9F9] p-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-[#2F4F4F] text-white">
+                <ShoppingCart className="h-6 w-6" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-[#2F4F4F]">Dashboard</h1>
+                <p className="text-[#2F4F4F]/80">Loading your dashboard...</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="h-64 flex items-center justify-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2F4F4F]"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">

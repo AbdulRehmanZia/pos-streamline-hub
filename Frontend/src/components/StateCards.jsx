@@ -21,7 +21,7 @@ const StatCards = ({ analyst }) => {
       <StatCard
         icon={<ShoppingCart className="h-5 w-5 text-blue-600" />}
         title="Total Sales Amount"
-        value={`$${analyst?.totalSalesAmount?.toLocaleString("en-US") ?? 0}`}
+        value={`Rs.${analyst?.totalSalesAmount?.toLocaleString("en-US") ?? 0}`}
       />
       <StatCard
         icon={<Package className="h-5 w-5 text-green-600" />}

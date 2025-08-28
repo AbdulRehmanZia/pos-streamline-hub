@@ -1,4 +1,4 @@
-import { createContext, useEffect, useMemo, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import { api } from "../Instance/api";
 
 export const UserContext = createContext(null);
@@ -26,24 +26,33 @@ const UserContextProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await api.post("/user/logout", {});
+      await api.post("/user/logout");
+      setUser(null);
+      setAccessToken(null);
+      localStorage.clear();
     } catch (err) {
-      console.error("Backend logout failed", err);
+      console.error("Logout failed", err);
     }
-
-    setUser(null);
-    setAccessToken(null);
-    localStorage.removeItem("user");
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
   };
 
-  const value = useMemo(
-    () => ({ user, setUser, accessToken, setAccessToken, logout }),
-    [user, accessToken]
-  );
+  const refreshToken = async () => {
+    try {
+      const response = await api.post("/user/refresh-token");
+      const { accessToken: newAccessToken } = response.data.data;
+      setAccessToken(newAccessToken);
+      return newAccessToken;
+    } catch (err) {
+      console.error("Token refresh failed", err);
+      logout();
+      throw err;
+    }
+  };
 
-  return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
+  return (
+    <UserContext.Provider value={{ user, setUser, accessToken, setAccessToken, logout, refreshToken }}>
+      {children}
+    </UserContext.Provider>
+  );
 };
 
 export default UserContextProvider;
