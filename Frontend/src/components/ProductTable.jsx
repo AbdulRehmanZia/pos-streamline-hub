@@ -493,10 +493,10 @@ export default function ProductTable({ refreshKey, forceRefresh }) {
                   <div className="text-sm text-[#1C3333]">{product.category?.name || "N/A"}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-center">
-                  <div className="text-sm text-[#1C3333]">${product.price.toFixed(2)}</div>
+                  <div className="text-sm text-[#1C3333]">Rs.{product.price.toFixed(2)}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-center">
-                  <div className="text-sm text-[#1C3333]">${product.costPrice.toFixed(2)}</div>
+                  <div className="text-sm text-[#1C3333]">Rs.{product.costPrice.toFixed(2)}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-center">
                   <div className={`text-sm font-medium ${

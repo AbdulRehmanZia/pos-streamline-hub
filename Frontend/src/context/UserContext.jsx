@@ -13,6 +13,40 @@ const UserContextProvider = ({ children }) => {
     return localStorage.getItem("accessToken") || null;
   });
 
+  const [isLoading, setIsLoading] = useState(true); 
+
+  // Auto-login check on app startup
+  useEffect(() => {
+    const checkAuthStatus = async () => {
+      const savedToken = localStorage.getItem("accessToken");
+      const savedUser = localStorage.getItem("user");
+      
+      if (savedToken && savedUser) {
+        try {
+          // Verify token is still valid by making a test API call
+          api.defaults.headers.common['Authorization'] = `Bearer ${savedToken}`;
+          
+          const response = await api.get("/api/v1/sales/"); 
+          
+          if (response.status === 200) {
+            setUser(JSON.parse(savedUser));
+            setAccessToken(savedToken);
+          } else {
+            throw new Error("Token invalid");
+          }
+        } catch (error) {
+          console.log("Token expired or invalid, clearing storage");
+          localStorage.clear();
+          setUser(null);
+          setAccessToken(null);
+        }
+      }
+      setIsLoading(false);
+    };
+
+    checkAuthStatus();
+  }, []);
+
   // Keep storage in sync
   useEffect(() => {
     if (user) localStorage.setItem("user", JSON.stringify(user));
@@ -20,8 +54,13 @@ const UserContextProvider = ({ children }) => {
   }, [user]);
 
   useEffect(() => {
-    if (accessToken) localStorage.setItem("accessToken", accessToken);
-    else localStorage.removeItem("accessToken");
+    if (accessToken) {
+      localStorage.setItem("accessToken", accessToken);
+      api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+    } else {
+      localStorage.removeItem("accessToken");
+      delete api.defaults.headers.common['Authorization'];
+    }
   }, [accessToken]);
 
   const logout = async () => {
@@ -30,6 +69,7 @@ const UserContextProvider = ({ children }) => {
       setUser(null);
       setAccessToken(null);
       localStorage.clear();
+      delete api.defaults.headers.common['Authorization'];
     } catch (err) {
       console.error("Logout failed", err);
     }
@@ -48,8 +88,23 @@ const UserContextProvider = ({ children }) => {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#1C3333]">
+        <div className="text-white">Loading...</div>
+      </div>
+    );
+  }
+
   return (
-    <UserContext.Provider value={{ user, setUser, accessToken, setAccessToken, logout, refreshToken }}>
+    <UserContext.Provider value={{ 
+      user, 
+      setUser, 
+      accessToken, 
+      setAccessToken, 
+      logout, 
+      refreshToken 
+    }}>
       {children}
     </UserContext.Provider>
   );
