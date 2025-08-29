@@ -19,43 +19,35 @@
   "package:linux": "npm run build && electron-builder --linux",
   "package:all": "npm run build && electron-builder -wml"
   },
-  "build": {
-    "appId": "com.saylaani.pos",
-    "productName": "POS System",
-    "directories": {
-      "output": "release-builds",
-      "buildResources": "build"
-    },
-    "files": [
-      "dist/**/*",
-      "electron/main.js",
-      "package.json",
-      "node_modules/**/*"
-    ],
-    "extraFiles": [
+"build": {
+  "appId": "com.saylani.pos",
+  "productName": "POS System",
+  "directories": {
+    "output": "release-builds",
+    "buildResources": "build"
+  },
+  "files": [
+    "dist/**/*",
+    "electron/main.js",
+    "package.json"
+  ],
+  "win": {
+    "target": [
       {
-        "from": "dist",
-        "to": "dist",
-        "filter": ["**/*"]
+        "target": "nsis",
+        "arch": ["x64"]
       }
     ],
-    "win": {
-  "target": [
-    {
-      "target": "nsis",
-      "arch": [
-        "x64",
-        "ia32"
-      ]
-    }
-  ],
-  "icon": "build/icon.ico"
-},
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true
-    }
+    "icon": "build/icon.ico"
   },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "installerIcon": "build/icon.ico",
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true
+  }
+},
   "dependencies": {
     "@ericblade/quagga2": "^0.0.14",
     "@headlessui/react": "^2.2.5",
