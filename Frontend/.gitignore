@@ -13,6 +13,7 @@ lerna-debug.log*
 /release-builds
 
 node_modules
+.env
 dist
 dist-ssr
 *.local
