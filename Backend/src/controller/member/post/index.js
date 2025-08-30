@@ -14,7 +14,7 @@ export const addStoreMember = async (req, res) => {
     const { error } = registerMemberValidation.validate(req.body);
     if (error) return ApiError(res, 400, error.details[0].message);
 
-    const { fullname, email, password } = req.body;
+    const { fullname, email, password, storeId } = req.body;
 
     // Check if user exists (active or soft-deleted)
     const existingUser = await prisma.user.findUnique({
