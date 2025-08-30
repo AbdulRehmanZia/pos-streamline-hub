@@ -11,9 +11,8 @@ const systemRequirements = [
 
 const DownloadSection = () => {
   const handleDownload = () => {
-    // Replace with your actual download link
-    const downloadUrl = "#";
-    window.open(downloadUrl, '_blank');
+    const downloadUrl = "https://github.com/AbdulRehmanZia/pos-streamline-hub/releases/download/v1.0.0/POS.System.Setup.0.0.0.exe";
+   window.location.href = downloadUrl;
   };
 
   return (
@@ -36,7 +35,7 @@ const DownloadSection = () => {
                   </h3>
                   <p className="text-muted-foreground mb-6">
                     Complete retail management solution with advanced features, 
-                    analytics, and seamless integration. Works offline and online.
+                    analytics, and seamless integration. Works online.
                   </p>
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
@@ -49,7 +48,7 @@ const DownloadSection = () => {
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 bg-primary rounded-full"></div>
-                      <span className="text-sm text-muted-foreground">Last updated: Dec 2024</span>
+                      <span className="text-sm text-muted-foreground">Last updated: Aug 2025</span>
                     </div>
                   </div>
                 </div>
@@ -64,34 +63,13 @@ const DownloadSection = () => {
                     <Download className="w-6 h-6" />
                     Download Now
                   </Button>
-                  <p className="text-sm text-muted-foreground">
-                    Free trial • No credit card required
-                  </p>
+                  
                 </div>
               </div>
             </CardContent>
           </Card>
           
-          <div>
-            <h3 className="text-2xl font-semibold text-foreground mb-8">
-              System Requirements
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              {systemRequirements.map((req, index) => (
-                <Card key={index} className="border-border/50">
-                  <CardContent className="p-4 text-center">
-                    <req.icon className="w-8 h-8 text-primary mx-auto mb-2" />
-                    <h4 className="font-medium text-foreground mb-1">
-                      {req.label}
-                    </h4>
-                    <p className="text-sm text-muted-foreground">
-                      {req.detail}
-                    </p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
+          
         </div>
       </div>
     </section>

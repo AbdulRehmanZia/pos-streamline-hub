@@ -17,7 +17,8 @@ const AdminRegister = () => {
   const [formData, setFormData] = useState<RegisterForm>({
     fullname: "",
     email: "",
-    password: ""
+    password: "",
+    plan: "",
   });
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
