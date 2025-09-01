@@ -32,6 +32,7 @@ model User {
   resetToken       String?
   resetTokenExpiry DateTime?
   role             Role      @default(cashier)
+  plan              Plan?
   ownedStores      Store[]   @relation("StoreOwner")
   memberOfStores   Store[]   @relation("StoreMembers")
   Sale             Sale[]
@@ -104,4 +105,10 @@ model SaleItem {
 enum Role {
   admin
   cashier
+}
+
+enum Plan {
+  basic
+  standard
+  premium
 }
