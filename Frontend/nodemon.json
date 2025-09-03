@@ -1,6 +1,0 @@
-{
-  "watch": ["dist"],
-  "ext": "html,js,css",
-  "delay": "1000",
-  "exec": "electron ."
-}
