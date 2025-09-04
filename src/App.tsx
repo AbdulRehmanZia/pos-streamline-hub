@@ -1,33 +1,75 @@
+// App.tsx
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+
+// Pages
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-import AdminRegister from "./pages/AdminRegister";
-import { withAuth } from "@/components/Auth";
-import  Login  from "./pages/Login";
 
-const ProtectedAdmin = withAuth(AdminRegister);
+// Components
+import AdminLogin from "./pages/Login";
+import AdminDashboard from "./pages/AdminRegister";
+import ProtectedRoute from "./components/ProtectedRoute";
+
+// Utils
+import { isAuthenticated } from "./middleware/TokenDecode";
+
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-           <Route path="/login" element={<Login />} />
-          <Route path="/" element={<Index />} />
-          <Route path="/admin" element={<ProtectedAdmin />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  const userIsAuthenticated = isAuthenticated();
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            {/* Public Routes */}
+            <Route 
+              path="/" 
+              element={
+                userIsAuthenticated ? (
+                  <Navigate to="/admin" replace />
+                ) : (
+                  <Index />
+                )
+              } 
+            />
+            
+            {/* Login Route - Redirect to admin if already authenticated */}
+            <Route 
+              path="/login" 
+              element={
+                userIsAuthenticated ? (
+                  <Navigate to="/admin" replace />
+                ) : (
+                  <AdminLogin />
+                )
+              } 
+            />
+
+            {/* Protected Admin Routes */}
+            <Route 
+              path="/admin" 
+              element={
+                <ProtectedRoute requireSuperAdmin={true}>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              } 
+            />
+
+            {/* 404 Route */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;

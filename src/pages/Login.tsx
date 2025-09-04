@@ -1,98 +1,167 @@
-// src/Login.jsx
-import React, { useState } from "react";
-import { Mail, Lock } from "lucide-react";
+// components/AdminLogin.tsx
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import { Monitor, Loader2, ArrowLeft } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { setToken } from "../middleware/TokenDecode";
+import api from "@/ApiInstance";
 
-const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [remember, setRemember] = useState(false);
+// 🔹 Form Interface
+interface LoginForm {
+  email: string;
+  password: string;
+}
 
-  const handleSubmit = (e) => {
+const AdminLogin = () => {
+  const [formData, setFormData] = useState<LoginForm>({
+    email: "",
+    password: "",
+  });
+
+  const [isLoading, setIsLoading] = useState(false) ;
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  // Submit Handler
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert(`Email: ${email} \nPassword: ${password} \nRemember: ${remember}`);
+    setIsLoading(true);
+
+    try {
+      const response = await api.post(
+        "/user/login",
+        formData
+      );
+
+      if (response.status === 200 && response.data.success) {
+        // Store token  
+        setToken(response.data.data);
+
+        toast({
+          title: "Success!",
+          description: "Super Admin Logged In Successfully",
+        });
+
+        // Redirect to Dashboard
+        navigate("/admin", { replace: true });
+      } else {
+        toast({
+          title: "Error",
+          description: response.data.message || "Failed to login Super Admin",
+          variant: "destructive",
+        });
+      }
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || "Network error. Please try again.";
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Change Handler
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white shadow-2xl hover:shadow-3xl transition-shadow rounded-3xl p-12 w-[400px] md:w-[450px] lg:w-[500px]">
-        {/* Logo */}
-        <div className="flex justify-center mb-6">
-          <img
-            src="https://upload.wikimedia.org/wikipedia/commons/a/ab/Logo_TV_2015.png"
-            alt="Logo"
-            className="w-24 h-24 object-contain"
-          />
+    <div className="h-screen bg-gradient-feature flex items-center justify-center py-12 px-4">
+      <div className="w-full max-w-md">
+        {/* Logo + Title */}
+        <div className="text-center mb-8">
+          <Link to="/" className="inline-flex items-center gap-2 mb-4">
+            <div className="p-2 bg-gradient-hero rounded-lg">
+              <Monitor className="w-6 h-6 text-primary-foreground" />
+            </div>
+            <span className="text-xl font-bold text-foreground">
+              RetailPOS
+            </span>
+          </Link>
+          <h1 className="text-3xl font-bold text-foreground mb-2">
+            Super Admin Login
+          </h1>
         </div>
 
-        <h2 className="text-3xl font-bold text-gray-800 text-center mb-8">
-          Welcome Back
-        </h2>
+        {/* Card */}
+        <Card className="shadow-feature">
+          <CardHeader />
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Email */}
+              <div className="space-y-2">
+                <Label htmlFor="email">Email Address</Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="Enter email address"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  disabled={isLoading}
+                />
+              </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Email */}
-          <div className="relative">
-            <Mail className="absolute top-4 left-4 text-gray-400 w-5 h-5" />
-            <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full pl-12 pr-4 py-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-500 focus:shadow-md text-gray-800 transition-all"
-              required
-            />
-          </div>
+              {/* Password */}
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  placeholder="Enter password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                  disabled={isLoading}
+                />
+              </div>
 
-          {/* Password */}
-          <div className="relative">
-            <Lock className="absolute top-4 left-4 text-gray-400 w-5 h-5" />
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full pl-12 pr-4 py-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-500 focus:shadow-md text-gray-800 transition-all"
-              required
-            />
-          </div>
+              {/* Submit Button */}
+              <Button
+                type="submit"
+                className="w-full"
+                variant="hero"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Loading...
+                  </>
+                ) : (
+                  "Login Super Admin"
+                )}
+              </Button>
+            </form>
 
-          {/* Remember & Forgot */}
-          <div className="flex justify-between items-center text-gray-600 text-sm">
-            <label className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                checked={remember}
-                onChange={() => setRemember(!remember)}
-                className="accent-gray-800"
-              />
-              <span>Remember me</span>
-            </label>
-            <a href="/forgot" className="hover:underline text-gray-800">
-              Forgot Password?
-            </a>
-          </div>
-
-          {/* Submit */}
-          <button
-            type="submit"
-            className="w-full py-4 bg-gray-800 text-white rounded-xl hover:bg-gray-900 transition-all font-semibold shadow-lg transform hover:scale-105"
-          >
-            Login
-          </button>
-        </form>
-
-        {/* Footer */}
-        <p className="mt-8 text-center text-gray-600 text-sm">
-          Don't have an account?{" "}
-          <a
-            href="/register"
-            className="text-gray-800 font-semibold hover:underline"
-          >
-            Sign Up
-          </a>
-        </p>
+            {/* Back to Home */}
+            <div className="mt-6 text-center">
+              <Link
+                to="/"
+                className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back to Home
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
 };
 
-export default Login;
+export default AdminLogin;
