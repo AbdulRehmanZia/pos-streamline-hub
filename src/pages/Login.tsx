@@ -34,7 +34,7 @@ const AdminLogin = () => {
 
     try {
       const response = await api.post(
-        "/user/login",
+        "/user/super-admin-login",
         formData
       );
 
